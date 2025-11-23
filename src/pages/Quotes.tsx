@@ -1,8 +1,9 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { exportToCSV, formatQuotesForExport } from "@/lib/csvExport";
+import { logDataExported } from "@/lib/activityLogger";
 
 const Quotes = () => {
   const navigate = useNavigate();
@@ -29,13 +32,23 @@ const Quotes = () => {
 
       const { data } = await supabase
         .from("quotes")
-        .select("*, clients(name)")
+        .select("*, clients(name, email)")
         .eq("company_id", profile?.company_id)
         .order("created_at", { ascending: false });
 
       return data;
     },
   });
+
+  const handleExport = async () => {
+    if (!quotes || quotes.length === 0) return;
+    
+    const clients = quotes.map(q => q.clients).filter(Boolean);
+    const formatted = formatQuotesForExport(quotes, clients);
+    exportToCSV(formatted, `quotes_export_${new Date().toISOString().split('T')[0]}.csv`);
+    
+    await logDataExported('quotes', quotes.length);
+  };
 
   const formatBDT = (amount: number) => {
     return `৳${parseFloat(amount.toString()).toLocaleString("en-BD", {
@@ -54,10 +67,16 @@ const Quotes = () => {
               Manage your sales quotes and proposals
             </p>
           </div>
-          <Button onClick={() => navigate("/quotes/new")}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Quote
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExport} disabled={!quotes || quotes.length === 0}>
+              <Download className="mr-2 h-4 w-4" />
+              Export CSV
+            </Button>
+            <Button onClick={() => navigate("/quotes/new")}>
+              <Plus className="mr-2 h-4 w-4" />
+              New Quote
+            </Button>
+          </div>
         </div>
 
         <Card>

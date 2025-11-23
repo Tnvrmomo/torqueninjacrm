@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Trash2, FileText } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, FileText, Download } from "lucide-react";
 import { format } from "date-fns";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { generateQuotePDF } from "@/lib/pdfGenerator";
+import { logQuotePDFDownloaded } from "@/lib/activityLogger";
 
 const QuoteDetail = () => {
   const { id } = useParams();
@@ -26,6 +28,26 @@ const QuoteDetail = () => {
       return data;
     },
   });
+
+  const handleDownloadPDF = async () => {
+    if (!quote) return;
+
+    const { data: company } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('id', quote.company_id)
+      .single();
+
+    const pdf = generateQuotePDF({
+      quote,
+      client: quote.clients,
+      company: company || {},
+      items: quote.quote_items || [],
+    });
+
+    pdf.save(`Quote_${quote.quote_number}.pdf`);
+    await logQuotePDFDownloaded(quote.id, quote.quote_number);
+  };
 
   const deleteQuoteMutation = useMutation({
     mutationFn: async () => {

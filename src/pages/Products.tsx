@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Upload } from "lucide-react";
+import { Plus, Search, Upload, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { exportToCSV, formatProductsForExport } from "@/lib/csvExport";
+import { logDataExported } from "@/lib/activityLogger";
 
 const Products = () => {
   const [search, setSearch] = useState("");
@@ -31,6 +33,15 @@ const Products = () => {
     },
   });
 
+  const handleExport = async () => {
+    if (!products || products.length === 0) return;
+    
+    const formatted = formatProductsForExport(products);
+    exportToCSV(formatted, `products_export_${new Date().toISOString().split('T')[0]}.csv`);
+    
+    await logDataExported('products', products.length);
+  };
+
   const formatBDT = (amount: number) => {
     return new Intl.NumberFormat("en-BD", {
       style: "currency",
@@ -50,6 +61,10 @@ const Products = () => {
             </p>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExport} disabled={!products || products.length === 0}>
+              <Download className="mr-2 h-4 w-4" />
+              Export CSV
+            </Button>
             <Button variant="outline" onClick={() => navigate("/import/products")}>
               <Upload className="mr-2 h-4 w-4" />
               Import CSV
