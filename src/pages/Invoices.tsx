@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { exportToCSV, formatInvoicesForExport } from "@/lib/csvExport";
+import { logDataExported } from "@/lib/activityLogger";
 
 const Invoices = () => {
   const [search, setSearch] = useState("");
@@ -19,7 +21,7 @@ const Invoices = () => {
     queryFn: async () => {
       let query = supabase
         .from("invoices")
-        .select("*, clients(name)")
+        .select("*, clients(name, email)")
         .order("created_at", { ascending: false });
 
       if (search) {
@@ -30,6 +32,16 @@ const Invoices = () => {
       return data || [];
     },
   });
+
+  const handleExport = async () => {
+    if (!invoices || invoices.length === 0) return;
+    
+    const clients = invoices.map(inv => inv.clients).filter(Boolean);
+    const formatted = formatInvoicesForExport(invoices, clients);
+    exportToCSV(formatted, `invoices_export_${new Date().toISOString().split('T')[0]}.csv`);
+    
+    await logDataExported('invoices', invoices.length);
+  };
 
   const formatBDT = (amount: number) => {
     return new Intl.NumberFormat("en-BD", {
@@ -61,10 +73,16 @@ const Invoices = () => {
               Create and manage invoices
             </p>
           </div>
-          <Button onClick={() => navigate("/invoices/new")}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Invoice
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExport} disabled={!invoices || invoices.length === 0}>
+              <Download className="mr-2 h-4 w-4" />
+              Export CSV
+            </Button>
+            <Button onClick={() => navigate("/invoices/new")}>
+              <Plus className="mr-2 h-4 w-4" />
+              New Invoice
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
