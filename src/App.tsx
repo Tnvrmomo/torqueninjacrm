@@ -50,6 +50,10 @@ import DashboardSettings from "./pages/DashboardSettings";
 import APIKeys from "./pages/APIKeys";
 import Notifications from "./pages/Notifications";
 import AdminSubscriptions from "./pages/admin/Subscriptions";
+import PlatformSettings from "./pages/admin/PlatformSettings";
+import DomainManagement from "./pages/admin/DomainManagement";
+import AdminUsers from "./pages/admin/Users";
+import CustomDomain from "./pages/CustomDomain";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 
@@ -107,6 +111,12 @@ const App = () => (
             <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
             <Route path="/dashboard-settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
             <Route path="/api-keys" element={<ProtectedRoute><APIKeys /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><SubscriptionRoute><Notifications /></SubscriptionRoute></ProtectedRoute>} />
+            <Route path="/admin/subscriptions" element={<ProtectedRoute><SubscriptionRoute><AdminSubscriptions /></SubscriptionRoute></ProtectedRoute>} />
+            <Route path="/admin/platform-settings" element={<ProtectedRoute><SubscriptionRoute><PlatformSettings /></SubscriptionRoute></ProtectedRoute>} />
+            <Route path="/admin/domains" element={<ProtectedRoute><SubscriptionRoute><DomainManagement /></SubscriptionRoute></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute><SubscriptionRoute><AdminUsers /></SubscriptionRoute></ProtectedRoute>} />
+            <Route path="/custom-domain" element={<ProtectedRoute><SubscriptionRoute><CustomDomain /></SubscriptionRoute></ProtectedRoute>} />
             <Route path="/client-portal" element={<ClientPortal />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
