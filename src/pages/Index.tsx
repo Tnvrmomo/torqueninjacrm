@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { 
   Package, 
   FileText, 
@@ -13,11 +16,42 @@ import {
   Check,
   Zap,
   Shield,
-  TrendingUp
+  TrendingUp,
+  Play,
+  Loader2
 } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
+  const [demoLoading, setDemoLoading] = useState(false);
+
+  const handleDemoLogin = async () => {
+    setDemoLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: 'demo@torqueninja.com',
+        password: 'demo123456',
+      });
+
+      if (error) {
+        toast.error("Demo account login failed. Please try manual login.");
+        console.error(error);
+        navigate('/login');
+        return;
+      }
+
+      if (data.user) {
+        toast.success("Logged in to demo account!");
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Demo login error:', error);
+      toast.error("Something went wrong. Please try again.");
+      navigate('/login');
+    } finally {
+      setDemoLoading(false);
+    }
+  };
 
   const features = [
     {
@@ -137,34 +171,29 @@ const Index = () => {
             and get AI-powered insights—all in one platform
           </p>
           
-          {/* Demo Credentials Banner */}
-          <div className="bg-primary/10 border-2 border-primary/20 rounded-lg p-6 max-w-md mx-auto">
-            <p className="font-semibold text-primary mb-3 flex items-center justify-center gap-2">
-              <Zap className="h-5 w-5" />
-              Try Demo Account
-            </p>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between bg-background/50 px-4 py-2 rounded">
-                <span className="text-muted-foreground">Email:</span>
-                <code className="font-mono font-semibold">demo@torqueninja.com</code>
-              </div>
-              <div className="flex items-center justify-between bg-background/50 px-4 py-2 rounded">
-                <span className="text-muted-foreground">Password:</span>
-                <code className="font-mono font-semibold">demo123456</code>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-3">
-              Full access to all features • Pre-loaded sample data
-            </p>
-          </div>
-
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
             <Button size="lg" className="gradient-primary shadow-primary text-lg px-8" onClick={() => navigate("/signup")}>
               <Zap className="mr-2 h-5 w-5" />
               Start Free Trial
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8" onClick={() => navigate("/login")}>
-              Try Demo Account
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-lg px-8" 
+              onClick={handleDemoLogin}
+              disabled={demoLoading}
+            >
+              {demoLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Logging in...
+                </>
+              ) : (
+                <>
+                  <Play className="mr-2 h-5 w-5" />
+                  View Live Demo
+                </>
+              )}
             </Button>
           </div>
           <div className="flex items-center justify-center gap-8 pt-8 text-sm text-muted-foreground">

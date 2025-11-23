@@ -2,18 +2,33 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
 
 const RecentActivity = () => {
+  const { user } = useAuth();
+  
   const { data: activities, isLoading } = useQuery({
-    queryKey: ["recent-activity"],
+    queryKey: ["recent-activity", user?.id],
     queryFn: async () => {
+      if (!user) return [];
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('company_id')
+        .eq('user_id', user.id)
+        .single();
+        
+      if (!profile?.company_id) return [];
+      
       const { data } = await supabase
         .from("activity_log")
         .select("*")
+        .eq('company_id', profile.company_id)
         .order("activity_date", { ascending: false })
         .limit(10);
       return data || [];
     },
+    enabled: !!user,
   });
 
   if (isLoading) {

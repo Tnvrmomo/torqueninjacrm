@@ -66,13 +66,26 @@ const Login = () => {
         setLoading(false);
         return;
       }
-    }
 
-    toast({
-      title: "Success",
-      description: "Logged in successfully",
-    });
-    navigate("/dashboard");
+      // Check user role for redirection
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .single();
+
+      toast({
+        title: "Success",
+        description: "Logged in successfully",
+      });
+
+      // Redirect based on role
+      if (roleData?.role === 'super_admin') {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+    }
   };
 
   return (

@@ -66,6 +66,10 @@ const PlatformSettings = lazy(() => import("./pages/admin/PlatformSettings"));
 const DomainManagement = lazy(() => import("./pages/admin/DomainManagement"));
 const AdminUsers = lazy(() => import("./pages/admin/Users"));
 const CustomDomain = lazy(() => import("./pages/CustomDomain"));
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminAPIKeys = lazy(() => import("./pages/admin/APIKeysManagement"));
+const AdminAnalytics = lazy(() => import("./pages/admin/Analytics"));
+const AdminPaymentGateways = lazy(() => import("./pages/admin/PaymentGateways"));
 
 const queryClient = new QueryClient();
 
@@ -150,10 +154,14 @@ const App = () => (
               <Route path="/custom-domain" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><CustomDomain /></Suspense></ProtectedRoute>} />
               
               {/* Admin Routes - Protected by AdminRoute */}
+              <Route path="/admin" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminDashboard /></Suspense></AdminRoute>} />
               <Route path="/admin/subscriptions" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminSubscriptions /></Suspense></AdminRoute>} />
               <Route path="/admin/platform-settings" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><PlatformSettings /></Suspense></AdminRoute>} />
               <Route path="/admin/domains" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><DomainManagement /></Suspense></AdminRoute>} />
               <Route path="/admin/users" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminUsers /></Suspense></AdminRoute>} />
+              <Route path="/admin/api-keys" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminAPIKeys /></Suspense></AdminRoute>} />
+              <Route path="/admin/analytics" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminAnalytics /></Suspense></AdminRoute>} />
+              <Route path="/admin/payment-gateways" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminPaymentGateways /></Suspense></AdminRoute>} />
               
               {/* 404 Catch-All */}
               <Route path="*" element={<NotFound />} />
