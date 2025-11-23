@@ -46,6 +46,7 @@ import Automation from "./pages/Automation";
 import Webhooks from "./pages/Webhooks";
 import APIKeys from "./pages/APIKeys";
 import NotFound from "./pages/NotFound";
+import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -58,9 +59,10 @@ const App = () => (
         <BrowserRouter basename="/cms">
           <AuthProvider>
             <Routes>
+            <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
             <Route path="/clients/new" element={<ProtectedRoute><ClientNew /></ProtectedRoute>} />
             <Route path="/clients/:id" element={<ProtectedRoute><ClientDetail /></ProtectedRoute>} />
