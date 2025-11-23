@@ -76,7 +76,7 @@ const Signup = () => {
       title: "Success!",
       description: "Your account has been created with a 7-day trial.",
     });
-    navigate("/");
+    navigate("/dashboard");
     setLoading(false);
   };
 
