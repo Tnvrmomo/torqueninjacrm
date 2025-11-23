@@ -1570,6 +1570,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_low_stock_notifications: { Args: never; Returns: undefined }
+      check_overdue_invoices: { Args: never; Returns: undefined }
+      check_subscription_expiry: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -1,1 +1,7 @@
 project_id = "krphkpliaoitytorrpcv"
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.check-notifications]
+verify_jwt = false
