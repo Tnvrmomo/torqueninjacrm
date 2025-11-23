@@ -70,6 +70,7 @@ const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminAPIKeys = lazy(() => import("./pages/admin/APIKeysManagement"));
 const AdminAnalytics = lazy(() => import("./pages/admin/Analytics"));
 const AdminPaymentGateways = lazy(() => import("./pages/admin/PaymentGateways"));
+const AdminUserPasswordReset = lazy(() => import("./pages/admin/UserPasswordReset"));
 
 const queryClient = new QueryClient();
 
@@ -162,6 +163,7 @@ const App = () => (
               <Route path="/admin/api-keys" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminAPIKeys /></Suspense></AdminRoute>} />
               <Route path="/admin/analytics" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminAnalytics /></Suspense></AdminRoute>} />
               <Route path="/admin/payment-gateways" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminPaymentGateways /></Suspense></AdminRoute>} />
+              <Route path="/admin/password-reset" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminUserPasswordReset /></Suspense></AdminRoute>} />
               
               {/* 404 Catch-All */}
               <Route path="*" element={<NotFound />} />

@@ -98,6 +98,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { name: "API Keys", href: "/admin/api-keys", icon: Key },
     { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     { name: "Payment Gateways", href: "/admin/payment-gateways", icon: DollarSign },
+    { name: "Reset User Password", href: "/admin/password-reset", icon: Key },
   ];
 
   const handleLogout = async () => {
