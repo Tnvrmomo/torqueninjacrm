@@ -7,6 +7,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SubscriptionRoute } from "@/components/auth/SubscriptionRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { lazy, Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -25,7 +27,6 @@ import InvoiceEdit from "./pages/InvoiceEdit";
 import Payments from "./pages/Payments";
 import PaymentNew from "./pages/PaymentNew";
 import PaymentDetail from "./pages/PaymentDetail";
-import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import ImportData from "./pages/ImportData";
 import Quotes from "./pages/Quotes";
@@ -49,13 +50,16 @@ import Billing from "./pages/Billing";
 import DashboardSettings from "./pages/DashboardSettings";
 import APIKeys from "./pages/APIKeys";
 import Notifications from "./pages/Notifications";
-import AdminSubscriptions from "./pages/admin/Subscriptions";
-import PlatformSettings from "./pages/admin/PlatformSettings";
-import DomainManagement from "./pages/admin/DomainManagement";
-import AdminUsers from "./pages/admin/Users";
-import CustomDomain from "./pages/CustomDomain";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
+
+// Lazy load heavy pages for better performance
+const Reports = lazy(() => import("./pages/Reports"));
+const AdminSubscriptions = lazy(() => import("./pages/admin/Subscriptions"));
+const PlatformSettings = lazy(() => import("./pages/admin/PlatformSettings"));
+const DomainManagement = lazy(() => import("./pages/admin/DomainManagement"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const CustomDomain = lazy(() => import("./pages/CustomDomain"));
 
 const queryClient = new QueryClient();
 
@@ -72,8 +76,6 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<ProtectedRoute><SubscriptionRoute><Dashboard /></SubscriptionRoute></ProtectedRoute>} />
-            <Route path="/notifications" element={<ProtectedRoute><SubscriptionRoute><Notifications /></SubscriptionRoute></ProtectedRoute>} />
-            <Route path="/admin/subscriptions" element={<ProtectedRoute><AdminSubscriptions /></ProtectedRoute>} />
             <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
             <Route path="/clients/new" element={<ProtectedRoute><ClientNew /></ProtectedRoute>} />
             <Route path="/clients/:id" element={<ProtectedRoute><ClientDetail /></ProtectedRoute>} />
@@ -101,7 +103,7 @@ const App = () => (
             <Route path="/projects/new" element={<ProtectedRoute><ProjectNew /></ProtectedRoute>} />
             <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
             <Route path="/projects/:id/edit" element={<ProtectedRoute><ProjectEdit /></ProtectedRoute>} />
-            <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+            <Route path="/reports" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><Reports /></Suspense></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/import" element={<ProtectedRoute><ImportData /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
@@ -112,11 +114,14 @@ const App = () => (
             <Route path="/dashboard-settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
             <Route path="/api-keys" element={<ProtectedRoute><APIKeys /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><SubscriptionRoute><Notifications /></SubscriptionRoute></ProtectedRoute>} />
-            <Route path="/admin/subscriptions" element={<ProtectedRoute><SubscriptionRoute><AdminSubscriptions /></SubscriptionRoute></ProtectedRoute>} />
-            <Route path="/admin/platform-settings" element={<ProtectedRoute><SubscriptionRoute><PlatformSettings /></SubscriptionRoute></ProtectedRoute>} />
-            <Route path="/admin/domains" element={<ProtectedRoute><SubscriptionRoute><DomainManagement /></SubscriptionRoute></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute><SubscriptionRoute><AdminUsers /></SubscriptionRoute></ProtectedRoute>} />
-            <Route path="/custom-domain" element={<ProtectedRoute><SubscriptionRoute><CustomDomain /></SubscriptionRoute></ProtectedRoute>} />
+            
+            {/* Admin Routes - Lazy Loaded */}
+            <Route path="/admin/subscriptions" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminSubscriptions /></Suspense></ProtectedRoute>} />
+            <Route path="/admin/platform-settings" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><PlatformSettings /></Suspense></ProtectedRoute>} />
+            <Route path="/admin/domains" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><DomainManagement /></Suspense></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminUsers /></Suspense></ProtectedRoute>} />
+            <Route path="/custom-domain" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><CustomDomain /></Suspense></ProtectedRoute>} />
+            
             <Route path="/client-portal" element={<ClientPortal />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

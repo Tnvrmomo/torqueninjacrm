@@ -19,11 +19,16 @@ import {
   User,
   Webhook,
   Key,
-  Zap
+  Zap,
+  Shield,
+  Globe,
+  UserCog
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { Separator } from "@/components/ui/separator";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -35,8 +40,26 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check if user is super admin
+  const { data: isSuperAdmin } = useQuery({
+    queryKey: ["isSuperAdmin"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "super_admin")
+        .maybeSingle();
+      
+      return !!data;
+    },
+  });
+
   const navigation = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Clients", href: "/clients", icon: Users },
     { name: "Products", href: "/products", icon: Package },
     { name: "Invoices", href: "/invoices", icon: FileText },
@@ -49,6 +72,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { name: "Webhooks", href: "/webhooks", icon: Webhook },
     { name: "API Keys", href: "/api-keys", icon: Key },
     { name: "Settings", href: "/settings", icon: Settings },
+  ];
+
+  const adminNavigation = [
+    { name: "Platform Settings", href: "/admin/platform-settings", icon: Shield },
+    { name: "Domain Management", href: "/admin/domains", icon: Globe },
+    { name: "Users", href: "/admin/users", icon: UserCog },
+    { name: "Subscriptions", href: "/admin/subscriptions", icon: CreditCard },
   ];
 
   const handleLogout = async () => {
@@ -123,6 +153,32 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 </Link>
               );
             })}
+            
+            {isSuperAdmin && (
+              <>
+                <Separator className="my-4" />
+                <div className="px-3 py-2 text-xs font-semibold text-muted-foreground">
+                  ADMIN
+                </div>
+                {adminNavigation.map((item) => {
+                  const isActive = location.pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      }`}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </>
+            )}
           </nav>
         </aside>
 
