@@ -53,6 +53,11 @@ import APIKeys from "./pages/APIKeys";
 import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
+import VerifyEmail from "./pages/VerifyEmail";
+import VerifyPending from "./pages/VerifyPending";
+import AIUsage from "./pages/AIUsage";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentFailure";
 
 // Lazy load heavy pages for better performance
 const Reports = lazy(() => import("./pages/Reports"));
@@ -77,6 +82,10 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/verify-pending" element={<VerifyPending />} />
+              <Route path="/payment/success" element={<PaymentSuccess />} />
+              <Route path="/payment/failure" element={<PaymentFailure />} />
               <Route path="/client-portal" element={<ClientPortal />} />
               
               {/* Protected Routes - Dashboard */}
@@ -129,6 +138,7 @@ const App = () => (
               <Route path="/webhooks" element={<ProtectedRoute><SubscriptionRoute><Webhooks /></SubscriptionRoute></ProtectedRoute>} />
               <Route path="/api-keys" element={<ProtectedRoute><SubscriptionRoute><APIKeys /></SubscriptionRoute></ProtectedRoute>} />
               <Route path="/notifications" element={<ProtectedRoute><SubscriptionRoute><Notifications /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/ai-usage" element={<ProtectedRoute><SubscriptionRoute><AIUsage /></SubscriptionRoute></ProtectedRoute>} />
               
               {/* Protected Routes - Settings & Profile */}
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

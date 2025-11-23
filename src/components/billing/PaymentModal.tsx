@@ -21,6 +21,19 @@ export const PaymentModal = ({ show, onClose }: PaymentModalProps) => {
   const navigate = useNavigate();
   const { subscription } = useAuth();
   const [timeRemaining, setTimeRemaining] = useState("");
+  const [dontShowToday, setDontShowToday] = useState(false);
+
+  // Check if we should show the modal based on localStorage
+  useEffect(() => {
+    const lastDismissed = localStorage.getItem('payment_modal_dismissed');
+    if (lastDismissed) {
+      const lastDismissedDate = new Date(lastDismissed);
+      const today = new Date();
+      if (lastDismissedDate.toDateString() === today.toDateString()) {
+        setDontShowToday(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (subscription?.trial_ends_at) {
@@ -180,9 +193,20 @@ export const PaymentModal = ({ show, onClose }: PaymentModalProps) => {
           {/* Footer */}
           <div className="text-center text-sm text-muted-foreground space-y-2">
             <p>All plans include 7-day free trial • Cancel anytime</p>
-            <Button variant="ghost" onClick={onClose}>
-              Continue with trial
-            </Button>
+            <div className="flex gap-2 justify-center">
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  localStorage.setItem('payment_modal_dismissed', new Date().toISOString());
+                  onClose();
+                }}
+              >
+                Don't show again today
+              </Button>
+              <Button variant="outline" onClick={onClose}>
+                Continue with trial
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>

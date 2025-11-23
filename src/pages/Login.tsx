@@ -27,7 +27,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -39,13 +39,40 @@ const Login = () => {
         variant: "destructive",
       });
       setLoading(false);
-    } else {
-      toast({
-        title: "Success",
-        description: "Logged in successfully",
-      });
-      navigate("/dashboard");
+      return;
     }
+
+    // Check if user has profile and company
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("company_id")
+        .eq("user_id", data.user.id)
+        .single();
+
+      if (!profile) {
+        toast({
+          title: "Account Setup Error",
+          description: "Your account is incomplete. Please contact support.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Check email verification (if required)
+      if (!data.user.email_confirmed_at) {
+        navigate("/verify-pending");
+        setLoading(false);
+        return;
+      }
+    }
+
+    toast({
+      title: "Success",
+      description: "Logged in successfully",
+    });
+    navigate("/dashboard");
   };
 
   return (

@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AIAssistant } from "@/components/ai/AIAssistant";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import { EmailVerificationBanner } from "@/components/auth/EmailVerificationBanner";
 import { 
   LayoutDashboard, 
   Users, 
@@ -67,6 +68,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { name: "Payments", href: "/payments", icon: CreditCard },
     { name: "Expenses", href: "/expenses", icon: Receipt },
     { name: "Projects", href: "/projects", icon: FolderKanban },
+    { name: "AI Usage", href: "/ai-usage", icon: BarChart3 },
     { name: "Reports", href: "/reports", icon: BarChart3 },
     { name: "Automation", href: "/automation", icon: Zap },
     { name: "Webhooks", href: "/webhooks", icon: Webhook },
@@ -184,6 +186,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
         {/* Main Content */}
         <main className="flex-1 p-6 lg:p-8">
+          <EmailVerificationBanner />
           {children}
         </main>
       </div>

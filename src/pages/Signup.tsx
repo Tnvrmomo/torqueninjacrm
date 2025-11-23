@@ -64,6 +64,7 @@ const Signup = () => {
       email,
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/verify-email`,
         data: {
           full_name: fullName,
           selected_plan: selectedPlan,
@@ -82,16 +83,24 @@ const Signup = () => {
       return;
     }
 
-    toast({
-      title: "Success!",
-      description: "Your account has been created with a 7-day trial. Redirecting...",
-    });
+    // Check if email confirmation is required
+    if (authData.user && !authData.user.email_confirmed_at && authData.user.identities?.length === 0) {
+      toast({
+        title: "Check Your Email",
+        description: "Please verify your email address to continue.",
+      });
+      navigate("/verify-pending");
+    } else {
+      toast({
+        title: "Success!",
+        description: "Your account has been created with a 7-day trial.",
+      });
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 500);
+    }
     
-    // Small delay to ensure session is established
-    setTimeout(() => {
-      navigate("/dashboard");
-      setLoading(false);
-    }, 500);
+    setLoading(false);
   };
 
   const selectedPlanData = plans.find(p => p.id === selectedPlan);
