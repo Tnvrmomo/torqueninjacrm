@@ -61,6 +61,47 @@ export type Database = {
           },
         ]
       }
+      ai_usage: {
+        Row: {
+          company_id: string
+          cost_bdt: number | null
+          cost_usd: number | null
+          created_at: string | null
+          id: string
+          tokens_used: number | null
+          usage_type: string
+          user_id: string | null
+        }
+        Insert: {
+          company_id: string
+          cost_bdt?: number | null
+          cost_usd?: number | null
+          created_at?: string | null
+          id?: string
+          tokens_used?: number | null
+          usage_type: string
+          user_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          cost_bdt?: number | null
+          cost_usd?: number | null
+          created_at?: string | null
+          id?: string
+          tokens_used?: number | null
+          usage_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_usage_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_keys: {
         Row: {
           company_id: string | null
@@ -351,6 +392,107 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      company_subscriptions: {
+        Row: {
+          amount_paid: number | null
+          cancelled_at: string | null
+          company_id: string
+          created_at: string | null
+          currency: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          payment_method: string | null
+          plan_id: string
+          status: string | null
+          trial_ends_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount_paid?: number | null
+          cancelled_at?: string | null
+          company_id: string
+          created_at?: string | null
+          currency?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          payment_method?: string | null
+          plan_id: string
+          status?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount_paid?: number | null
+          cancelled_at?: string | null
+          company_id?: string
+          created_at?: string | null
+          currency?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          payment_method?: string | null
+          plan_id?: string
+          status?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_subscriptions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dashboard_customization: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          id: string
+          theme_settings: Json | null
+          updated_at: string | null
+          visible_modules: Json | null
+          widget_layout: Json | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          id?: string
+          theme_settings?: Json | null
+          updated_at?: string | null
+          visible_modules?: Json | null
+          widget_layout?: Json | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          id?: string
+          theme_settings?: Json | null
+          updated_at?: string | null
+          visible_modules?: Json | null
+          widget_layout?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dashboard_customization_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       expenses: {
         Row: {
@@ -704,6 +846,63 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_transactions: {
+        Row: {
+          amount_bdt: number | null
+          amount_usd: number | null
+          company_id: string
+          created_at: string | null
+          currency: string
+          id: string
+          metadata: Json | null
+          payment_gateway_id: string | null
+          payment_method: string
+          status: string | null
+          subscription_id: string | null
+        }
+        Insert: {
+          amount_bdt?: number | null
+          amount_usd?: number | null
+          company_id: string
+          created_at?: string | null
+          currency: string
+          id?: string
+          metadata?: Json | null
+          payment_gateway_id?: string | null
+          payment_method: string
+          status?: string | null
+          subscription_id?: string | null
+        }
+        Update: {
+          amount_bdt?: number | null
+          amount_usd?: number | null
+          company_id?: string
+          created_at?: string | null
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          payment_gateway_id?: string | null
+          payment_method?: string
+          status?: string | null
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "company_subscriptions"
             referencedColumns: ["id"]
           },
         ]
@@ -1220,6 +1419,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_plans: {
+        Row: {
+          ai_queries_limit: number | null
+          created_at: string | null
+          description: string | null
+          features: Json | null
+          id: string
+          is_one_time: boolean | null
+          name: string
+          price_bdt: number
+          price_usd: number
+        }
+        Insert: {
+          ai_queries_limit?: number | null
+          created_at?: string | null
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_one_time?: boolean | null
+          name: string
+          price_bdt: number
+          price_usd: number
+        }
+        Update: {
+          ai_queries_limit?: number | null
+          created_at?: string | null
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_one_time?: boolean | null
+          name?: string
+          price_bdt?: number
+          price_usd?: number
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
