@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layout/MainLayout";
 import ClientForm from "@/components/clients/ClientForm";
 import { useToast } from "@/hooks/use-toast";
+import { logClientCreated } from "@/lib/activityLogger";
 
 const ClientNew = () => {
   const navigate = useNavigate();
@@ -28,7 +29,8 @@ const ClientNew = () => {
       if (error) throw error;
       return client;
     },
-    onSuccess: (client) => {
+    onSuccess: async (client) => {
+      await logClientCreated(client.id, client.name);
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast({
         title: "Success",

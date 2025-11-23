@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { logQuoteUpdated } from "@/lib/activityLogger";
 
 interface QuoteItem {
   id?: string;
@@ -111,7 +112,8 @@ const QuoteEdit = () => {
       const { error: itemsError } = await supabase.from("quote_items").insert(itemsToInsert);
       if (itemsError) throw itemsError;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await logQuoteUpdated(id!, quote?.quote_number || 'Unknown');
       queryClient.invalidateQueries({ queryKey: ["quote", id] });
       toast({ title: "Success", description: "Quote updated successfully" });
       navigate(`/quotes/${id}`);

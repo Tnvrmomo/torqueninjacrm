@@ -7,6 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { logProductUpdated } from "@/lib/activityLogger";
 
 const ProductEdit = () => {
   const { id } = useParams();
@@ -26,7 +27,8 @@ const ProductEdit = () => {
       const { error } = await supabase.from("products").update(data).eq("id", id!);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await logProductUpdated(id!, product?.name || 'Unknown');
       queryClient.invalidateQueries({ queryKey: ["product", id] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast({ title: "Success", description: "Product updated successfully" });

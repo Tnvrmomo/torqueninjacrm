@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { logPaymentCreated } from "@/lib/activityLogger";
 
 const PaymentNew = () => {
   const navigate = useNavigate();
@@ -95,9 +96,10 @@ const PaymentNew = () => {
         }
       }
 
-      return payment.id;
+      return { id: payment.id, number: paymentNumber, amount: paymentAmount };
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      await logPaymentCreated(data.id, data.number, data.amount);
       toast({ title: "Success", description: "Payment recorded successfully" });
       navigate("/payments");
     },

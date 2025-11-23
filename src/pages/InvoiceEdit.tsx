@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { logInvoiceUpdated } from "@/lib/activityLogger";
 
 interface InvoiceItem {
   id?: string;
@@ -132,7 +133,8 @@ const InvoiceEdit = () => {
       const { error: itemsError } = await supabase.from("invoice_items").insert(itemsToInsert);
       if (itemsError) throw itemsError;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await logInvoiceUpdated(id!, invoice?.invoice_number || 'Unknown');
       queryClient.invalidateQueries({ queryKey: ["invoice", id] });
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       toast({ title: "Success", description: "Invoice updated successfully" });
