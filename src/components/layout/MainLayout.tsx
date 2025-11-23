@@ -14,7 +14,10 @@ import {
   Menu,
   X,
   LogOut,
-  User
+  User,
+  Webhook,
+  Key,
+  Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +43,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { name: "Expenses", href: "/expenses", icon: Receipt },
     { name: "Projects", href: "/projects", icon: FolderKanban },
     { name: "Reports", href: "/reports", icon: BarChart3 },
+    { name: "Automation", href: "/automation", icon: Zap },
+    { name: "Webhooks", href: "/webhooks", icon: Webhook },
+    { name: "API Keys", href: "/api-keys", icon: Key },
     { name: "Settings", href: "/settings", icon: Settings },
   ];
 

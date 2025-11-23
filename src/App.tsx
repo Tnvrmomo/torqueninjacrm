@@ -29,6 +29,10 @@ import Expenses from "./pages/Expenses";
 import Projects from "./pages/Projects";
 import Profile from "./pages/Profile";
 import ActivityLog from "./pages/ActivityLog";
+import ClientPortal from "./pages/ClientPortal";
+import Automation from "./pages/Automation";
+import Webhooks from "./pages/Webhooks";
+import APIKeys from "./pages/APIKeys";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -65,6 +69,10 @@ const App = () => (
             <Route path="/import" element={<ProtectedRoute><ImportData /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/activity-log" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
+            <Route path="/automation" element={<ProtectedRoute><Automation /></ProtectedRoute>} />
+            <Route path="/webhooks" element={<ProtectedRoute><Webhooks /></ProtectedRoute>} />
+            <Route path="/api-keys" element={<ProtectedRoute><APIKeys /></ProtectedRoute>} />
+            <Route path="/client-portal" element={<ClientPortal />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
