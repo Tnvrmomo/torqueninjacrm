@@ -109,9 +109,29 @@ const InvoiceDetail = () => {
     doc.save(`Invoice-${invoice.invoice_number}.pdf`);
   };
 
-  const sendEmail = () => {
-    toast({ title: "Coming Soon", description: "Email sending will be available soon" });
-  };
+  const sendEmailMutation = useMutation({
+    mutationFn: async () => {
+      if (!invoice?.clients?.email) {
+        throw new Error("Client email not found");
+      }
+
+      const { error } = await supabase.functions.invoke("send-invoice-email", {
+        body: {
+          invoiceId: id,
+          to: invoice.clients.email,
+        },
+      });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invoice", id] });
+      toast({ title: "Success", description: "Invoice email sent successfully" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -165,11 +185,11 @@ const InvoiceDetail = () => {
               <Download className="h-4 w-4 mr-2" />
               PDF
             </Button>
-            <Button variant="outline" size="sm" onClick={sendEmail}>
+            <Button variant="outline" size="sm" onClick={() => sendEmailMutation.mutate()} disabled={sendEmailMutation.isPending || !invoice.clients?.email}>
               <Mail className="h-4 w-4 mr-2" />
               Email
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => navigate(`/invoices/${id}/edit`)}>
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
