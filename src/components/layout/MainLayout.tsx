@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AIAssistant } from "@/components/ai/AIAssistant";
+import NotificationBell from "@/components/notifications/NotificationBell";
 import { 
   LayoutDashboard, 
   Users, 
@@ -86,6 +87,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           </div>
           
           <div className="flex items-center gap-2">
+            <NotificationBell />
             <Button variant="ghost" size="icon" onClick={() => navigate("/profile")}>
               <User className="h-5 w-5" />
             </Button>

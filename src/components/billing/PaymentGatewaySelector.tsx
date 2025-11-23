@@ -22,9 +22,13 @@ export const PaymentGatewaySelector = ({ planId, currency, amount, onSuccess }: 
   const { toast } = useToast();
 
   const gateways = currency === "USD" 
-    ? [{ id: "stripe", name: "Credit/Debit Card", icon: CreditCard }]
+    ? [
+        { id: "stripe", name: "Credit/Debit Card (Stripe)", icon: CreditCard },
+        { id: "sslcommerz", name: "Credit/Debit Card (SSLCommerz)", icon: CreditCard },
+      ]
     : [
-        { id: "stripe", name: "Credit/Debit Card", icon: CreditCard },
+        { id: "stripe", name: "Credit/Debit Card (Stripe)", icon: CreditCard },
+        { id: "sslcommerz", name: "Credit/Debit Card (SSLCommerz)", icon: CreditCard },
         { id: "bkash", name: "bKash", icon: Smartphone },
         { id: "nagad", name: "Nagad", icon: Smartphone },
         { id: "rocket", name: "Rocket", icon: Smartphone },
@@ -39,17 +43,21 @@ export const PaymentGatewaySelector = ({ planId, currency, amount, onSuccess }: 
         response = await supabase.functions.invoke("stripe-checkout", {
           body: { planId, currency }
         });
-      } else if (selectedGateway === "bkash") {
+      } else if (selectedGateway === "sslcommerz") {
+        response = await supabase.functions.invoke("sslcommerz-payment", {
+          body: { planId, currency }
+        });
+      } else if (selectedGateway === "bkash" || selectedGateway === "nagad" || selectedGateway === "rocket") {
         if (!phoneNumber) {
           toast({
             title: "Phone number required",
-            description: "Please enter your bKash phone number",
+            description: `Please enter your ${selectedGateway} phone number`,
             variant: "destructive"
           });
           setLoading(false);
           return;
         }
-        response = await supabase.functions.invoke("bkash-payment", {
+        response = await supabase.functions.invoke(`${selectedGateway}-payment`, {
           body: { planId, phoneNumber }
         });
       }
@@ -60,10 +68,14 @@ export const PaymentGatewaySelector = ({ planId, currency, amount, onSuccess }: 
 
       toast({
         title: "Payment initiated",
-        description: "Redirecting to payment gateway...",
+        description: response.data?.message || "Redirecting to payment gateway...",
       });
 
-      // In production, redirect to payment gateway
+      // In production, redirect to payment gateway URL
+      // if (response.data?.paymentUrl || response.data?.checkoutUrl) {
+      //   window.location.href = response.data.paymentUrl || response.data.checkoutUrl;
+      // }
+
       // For now, simulate success after 2 seconds
       setTimeout(() => {
         onSuccess();
