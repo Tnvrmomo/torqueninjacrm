@@ -28,10 +28,14 @@ const Login = () => {
         description: error.message,
         variant: "destructive",
       });
+      setLoading(false);
     } else {
-      navigate("/");
+      toast({
+        title: "Success",
+        description: "Logged in successfully",
+      });
+      navigate("/dashboard");
     }
-    setLoading(false);
   };
 
   return (

@@ -74,10 +74,14 @@ const Signup = () => {
 
     toast({
       title: "Success!",
-      description: "Your account has been created with a 7-day trial.",
+      description: "Your account has been created with a 7-day trial. Redirecting...",
     });
-    navigate("/dashboard");
-    setLoading(false);
+    
+    // Small delay to ensure session is established
+    setTimeout(() => {
+      navigate("/dashboard");
+      setLoading(false);
+    }, 500);
   };
 
   const selectedPlanData = plans.find(p => p.id === selectedPlan);
