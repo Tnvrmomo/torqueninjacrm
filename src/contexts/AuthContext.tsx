@@ -3,6 +3,14 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
+interface SubscriptionPlan {
+  name: string;
+  features: any;
+  ai_queries_limit: number | null;
+  price_bdt: number;
+  price_usd: number;
+}
+
 interface CompanySubscription {
   id: string;
   plan_id: string;
@@ -10,11 +18,7 @@ interface CompanySubscription {
   currency: string;
   trial_ends_at: string | null;
   current_period_end: string | null;
-  plan?: {
-    name: string;
-    features: any;
-    ai_queries_limit: number | null;
-  };
+  plan?: SubscriptionPlan;
 }
 
 interface AuthContextType {

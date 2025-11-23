@@ -44,6 +44,8 @@ import ActivityLog from "./pages/ActivityLog";
 import ClientPortal from "./pages/ClientPortal";
 import Automation from "./pages/Automation";
 import Webhooks from "./pages/Webhooks";
+import Billing from "./pages/Billing";
+import DashboardSettings from "./pages/DashboardSettings";
 import APIKeys from "./pages/APIKeys";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
@@ -97,6 +99,8 @@ const App = () => (
             <Route path="/activity-log" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
             <Route path="/automation" element={<ProtectedRoute><Automation /></ProtectedRoute>} />
             <Route path="/webhooks" element={<ProtectedRoute><Webhooks /></ProtectedRoute>} />
+            <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
+            <Route path="/dashboard-settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
             <Route path="/api-keys" element={<ProtectedRoute><APIKeys /></ProtectedRoute>} />
             <Route path="/client-portal" element={<ClientPortal />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

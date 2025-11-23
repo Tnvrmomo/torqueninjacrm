@@ -1,5 +1,6 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { AIAssistant } from "@/components/ai/AIAssistant";
 import { 
   LayoutDashboard, 
   Users, 
@@ -128,6 +129,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           {children}
         </main>
       </div>
+      <AIAssistant />
     </div>
   );
 };
