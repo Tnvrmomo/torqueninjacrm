@@ -65,7 +65,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter basename="/cms">
+        <BrowserRouter>
           <AuthProvider>
             <Routes>
             <Route path="/" element={<Index />} />
