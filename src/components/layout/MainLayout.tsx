@@ -23,9 +23,14 @@ import {
   Zap,
   Shield,
   Globe,
-  UserCog
+  UserCog,
+  DollarSign,
+  ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
@@ -37,9 +42,17 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [userEmail, setUserEmail] = useState<string>("");
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Get user email
+  supabase.auth.getUser().then(({ data }) => {
+    if (data.user?.email && !userEmail) {
+      setUserEmail(data.user.email);
+    }
+  });
 
   // Check if user is super admin
   const { data: isSuperAdmin } = useQuery({
@@ -77,10 +90,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   ];
 
   const adminNavigation = [
-    { name: "Platform Settings", href: "/admin/platform-settings", icon: Shield },
-    { name: "Domain Management", href: "/admin/domains", icon: Globe },
+    { name: "Admin Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Users", href: "/admin/users", icon: UserCog },
     { name: "Subscriptions", href: "/admin/subscriptions", icon: CreditCard },
+    { name: "Platform Settings", href: "/admin/platform-settings", icon: Shield },
+    { name: "Domains", href: "/admin/domains", icon: Globe },
+    { name: "API Keys", href: "/admin/api-keys", icon: Key },
+    { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+    { name: "Payment Gateways", href: "/admin/payment-gateways", icon: DollarSign },
   ];
 
   const handleLogout = async () => {
@@ -120,12 +137,31 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           
           <div className="flex items-center gap-2">
             <NotificationBell />
-            <Button variant="ghost" size="icon" onClick={() => navigate("/profile")}>
-              <User className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleLogout}>
-              <LogOut className="h-5 w-5" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {userEmail?.[0]?.toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  {isSuperAdmin && (
+                    <Badge variant="destructive" className="text-xs px-2 py-0">ADMIN</Badge>
+                  )}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  <User className="h-4 w-4 mr-2" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>

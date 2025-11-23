@@ -2,14 +2,28 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, FileText, Clock, CheckCircle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const DashboardStats = () => {
+  const { user } = useAuth();
+  
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["dashboard-stats"],
+    queryKey: ["dashboard-stats", user?.id],
     queryFn: async () => {
+      if (!user) return null;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('company_id')
+        .eq('user_id', user.id)
+        .single();
+        
+      if (!profile?.company_id) return null;
+      
       const { data: invoices } = await supabase
         .from("invoices")
-        .select("status, total, balance");
+        .select("status, total, balance")
+        .eq('company_id', profile.company_id);
       
       const draft = invoices?.filter(i => i.status === "draft").length || 0;
       const sent = invoices?.filter(i => i.status === "sent").length || 0;
@@ -28,6 +42,7 @@ const DashboardStats = () => {
         outstanding,
       };
     },
+    enabled: !!user,
   });
 
   const formatBDT = (amount: number) => {
