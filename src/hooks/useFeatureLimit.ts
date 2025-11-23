@@ -7,6 +7,34 @@ type FeatureType = 'products' | 'invoices' | 'quotes' | 'ai_queries';
 export const useFeatureLimit = (feature: FeatureType) => {
   const { user, subscription } = useAuth();
   
+  // Check super admin status
+  const { data: isSuperAdmin } = useQuery({
+    queryKey: ['is-super-admin', user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'super_admin')
+        .single();
+      return !!data;
+    },
+    enabled: !!user
+  });
+  
+  // Super admin has unlimited everything
+  if (isSuperAdmin) {
+    return {
+      canAdd: true,
+      limitReached: false,
+      currentCount: 0,
+      limit: null,
+      planName: 'Super Admin',
+      isLoading: false
+    };
+  }
+  
   const { data: currentCount, isLoading } = useQuery({
     queryKey: [feature, 'count', user?.id],
     queryFn: async () => {

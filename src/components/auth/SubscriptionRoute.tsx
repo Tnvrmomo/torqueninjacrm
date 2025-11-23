@@ -4,14 +4,37 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SubscriptionRouteProps {
   children: ReactNode;
 }
 
 export const SubscriptionRoute = ({ children }: SubscriptionRouteProps) => {
-  const { subscription } = useAuth();
+  const { subscription, user } = useAuth();
   const navigate = useNavigate();
+  
+  // Check if super admin
+  const { data: isSuperAdmin } = useQuery({
+    queryKey: ['is-super-admin', user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'super_admin')
+        .single();
+      return !!data;
+    },
+    enabled: !!user
+  });
+  
+  // Super admin bypasses all subscription checks
+  if (isSuperAdmin) {
+    return <>{children}</>;
+  }
   
   // Allow trial and active subscriptions
   if (subscription?.status === 'trial' || subscription?.status === 'active') {

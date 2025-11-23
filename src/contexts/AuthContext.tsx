@@ -40,25 +40,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
 
   const fetchSubscription = async (userId: string) => {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('company_id')
-      .eq('user_id', userId)
-      .single();
+    try {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('company_id')
+        .eq('user_id', userId)
+        .single();
 
-    if (!profile?.company_id) return;
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        return;
+      }
 
-    const { data: subscriptionData } = await supabase
-      .from('company_subscriptions')
-      .select(`
-        *,
-        plan:subscription_plans(name, features, ai_queries_limit)
-      `)
-      .eq('company_id', profile.company_id)
-      .single();
+      if (!profile?.company_id) {
+        console.warn('No company_id found for user');
+        return;
+      }
 
-    if (subscriptionData) {
-      setSubscription(subscriptionData as any);
+      const { data: subscriptionData, error: subError } = await supabase
+        .from('company_subscriptions')
+        .select(`
+          *,
+          plan:subscription_plans(name, features, ai_queries_limit, price_bdt, price_usd)
+        `)
+        .eq('company_id', profile.company_id)
+        .single();
+
+      if (subError) {
+        console.error('Subscription fetch error:', subError);
+        return;
+      }
+
+      if (subscriptionData) {
+        setSubscription(subscriptionData as any);
+      }
+    } catch (err) {
+      console.error('Subscription fetch error:', err);
     }
   };
 
