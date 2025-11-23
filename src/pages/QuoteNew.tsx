@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { logQuoteCreated } from "@/lib/activityLogger";
 
 interface QuoteItem {
   product_id?: string;
@@ -96,11 +97,12 @@ const QuoteNew = () => {
       const { error: itemsError } = await supabase.from("quote_items").insert(itemsToInsert);
       if (itemsError) throw itemsError;
 
-      return quote.id;
+      return { id: quote.id, number: quoteNumber };
     },
-    onSuccess: (quoteId) => {
+    onSuccess: async (data) => {
+      await logQuoteCreated(data.id, data.number);
       toast({ title: "Success", description: "Quote created successfully" });
-      navigate(`/quotes/${quoteId}`);
+      navigate(`/quotes/${data.id}`);
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });

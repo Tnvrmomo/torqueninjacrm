@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, Edit, Trash2, Package } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { logProductDeleted } from "@/lib/activityLogger";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -27,7 +28,8 @@ const ProductDetail = () => {
       const { error } = await supabase.from("products").delete().eq("id", id!);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await logProductDeleted(product?.name || 'Unknown');
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast({ title: "Success", description: "Product deleted successfully" });
       navigate("/products");

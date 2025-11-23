@@ -10,7 +10,7 @@ import { ArrowLeft, Edit, Trash2, FileText, Download } from "lucide-react";
 import { format } from "date-fns";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { generateQuotePDF } from "@/lib/pdfGenerator";
-import { logQuotePDFDownloaded } from "@/lib/activityLogger";
+import { logQuotePDFDownloaded, logQuoteDeleted } from "@/lib/activityLogger";
 
 const QuoteDetail = () => {
   const { id } = useParams();
@@ -55,7 +55,8 @@ const QuoteDetail = () => {
       const { error } = await supabase.from("quotes").delete().eq("id", id!);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await logQuoteDeleted(quote?.quote_number || 'Unknown');
       toast({ title: "Success", description: "Quote deleted successfully" });
       navigate("/quotes");
     },
@@ -177,6 +178,10 @@ const QuoteDetail = () => {
               <FileText className="h-4 w-4 mr-2" />
               Convert to Invoice
             </Button>
+            <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
+              <Download className="h-4 w-4 mr-2" />
+              Download PDF
+            </Button>
             <Button variant="outline" size="sm" onClick={() => navigate(`/quotes/${id}/edit`)}>
               <Edit className="h-4 w-4 mr-2" />
               Edit
@@ -190,9 +195,9 @@ const QuoteDetail = () => {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Quote?</AlertDialogTitle>
+                  <AlertDialogTitle>Delete Quote</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone.
+                    Are you sure you want to delete this quote? This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -204,56 +209,77 @@ const QuoteDetail = () => {
           </div>
         </div>
 
-        <Card className="p-6">
-          <h2 className="font-semibold text-lg mb-4">Quote Details</h2>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Issue Date:</span>
-              <span className="font-medium">{format(new Date(quote.issue_date), "dd MMM yyyy")}</span>
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card className="p-6">
+            <div className="text-sm text-muted-foreground mb-1">Issue Date</div>
+            <div className="font-semibold">{format(new Date(quote.issue_date), "PPP")}</div>
+          </Card>
+          <Card className="p-6">
+            <div className="text-sm text-muted-foreground mb-1">Expiry Date</div>
+            <div className="font-semibold">
+              {quote.expiry_date ? format(new Date(quote.expiry_date), "PPP") : "No expiry"}
             </div>
-            {quote.expiry_date && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Expiry Date:</span>
-                <span className="font-medium">{format(new Date(quote.expiry_date), "dd MMM yyyy")}</span>
-              </div>
-            )}
-          </div>
-        </Card>
+          </Card>
+          <Card className="p-6">
+            <div className="text-sm text-muted-foreground mb-1">Total Amount</div>
+            <div className="text-2xl font-bold text-primary">{formatBDT(quote.total)}</div>
+          </Card>
+        </div>
 
         <Card className="p-6">
-          <h2 className="font-semibold text-lg mb-4">Line Items</h2>
-          <div className="space-y-2">
+          <h3 className="text-lg font-semibold mb-4">Line Items</h3>
+          <div className="space-y-4">
             {quote.quote_items?.map((item: any) => (
-              <div key={item.id} className="grid grid-cols-12 gap-4 py-2 border-b">
-                <div className="col-span-5">{item.description}</div>
-                <div className="col-span-2 text-right">{item.quantity}</div>
-                <div className="col-span-2 text-right">{formatBDT(item.unit_price)}</div>
-                <div className="col-span-2 text-right">{formatBDT(item.discount)}</div>
-                <div className="col-span-1 text-right font-semibold">{formatBDT(item.line_total)}</div>
+              <div key={item.id} className="flex justify-between items-start border-b pb-4 last:border-0">
+                <div className="flex-1">
+                  <div className="font-medium">{item.description}</div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Quantity: {item.quantity} × {formatBDT(item.unit_price)}
+                    {item.discount > 0 && ` (Discount: ${formatBDT(item.discount)})`}
+                  </div>
+                </div>
+                <div className="text-right font-semibold">{formatBDT(item.line_total)}</div>
               </div>
             ))}
           </div>
-          <div className="border-t mt-4 pt-4">
-            <div className="flex justify-between text-lg font-bold">
+
+          <div className="border-t mt-4 pt-4 space-y-2">
+            <div className="flex justify-between">
+              <span>Subtotal:</span>
+              <span className="font-semibold">{formatBDT(quote.subtotal)}</span>
+            </div>
+            {quote.discount > 0 && (
+              <div className="flex justify-between">
+                <span>Discount:</span>
+                <span className="font-semibold">-{formatBDT(quote.discount)}</span>
+              </div>
+            )}
+            {quote.tax_amount > 0 && (
+              <div className="flex justify-between">
+                <span>VAT:</span>
+                <span className="font-semibold">{formatBDT(quote.tax_amount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-lg font-bold border-t pt-2">
               <span>Total:</span>
-              <span className="text-primary">{formatBDT(quote.total)}</span>
+              <span>{formatBDT(quote.total)}</span>
             </div>
           </div>
         </Card>
 
         {(quote.public_notes || quote.private_notes) && (
           <Card className="p-6">
-            <h2 className="font-semibold text-lg mb-4">Notes</h2>
+            <h3 className="text-lg font-semibold mb-4">Notes</h3>
             {quote.public_notes && (
               <div className="mb-4">
-                <div className="text-sm font-semibold mb-1">Public Notes</div>
-                <p className="text-sm text-muted-foreground">{quote.public_notes}</p>
+                <div className="text-sm font-medium mb-1">Public Notes</div>
+                <p className="text-muted-foreground">{quote.public_notes}</p>
               </div>
             )}
             {quote.private_notes && (
               <div>
-                <div className="text-sm font-semibold mb-1">Private Notes</div>
-                <p className="text-sm text-muted-foreground">{quote.private_notes}</p>
+                <div className="text-sm font-medium mb-1">Private Notes</div>
+                <p className="text-muted-foreground">{quote.private_notes}</p>
               </div>
             )}
           </Card>

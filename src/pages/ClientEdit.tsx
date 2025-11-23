@@ -7,6 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { logClientUpdated } from "@/lib/activityLogger";
 
 const ClientEdit = () => {
   const { id } = useParams();
@@ -26,7 +27,8 @@ const ClientEdit = () => {
       const { error } = await supabase.from("clients").update(data).eq("id", id!);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await logClientUpdated(id!, client?.name || 'Unknown');
       queryClient.invalidateQueries({ queryKey: ["client", id] });
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast({ title: "Success", description: "Client updated successfully" });

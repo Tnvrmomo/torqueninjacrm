@@ -138,16 +138,76 @@ export const formatPaymentsForExport = (payments: any[], invoices: any[], client
   });
 };
 
-export const formatExpensesForExport = (expenses: any[]) => {
-  return expenses.map(expense => ({
-    'Expense Date': expense.expense_date,
-    'Category': expense.category,
-    'Vendor': expense.vendor || '',
-    'Description': expense.description || '',
-    'Amount': expense.amount,
-    'Payment Method': expense.payment_method || '',
-    'Notes': expense.notes || '',
-    'Receipt URL': expense.receipt_url || '',
-    'Created At': expense.created_at,
+export const formatSalesReportForExport = (invoices: any[]) => {
+  return invoices.map(invoice => ({
+    'Invoice Number': invoice.invoice_number,
+    'Issue Date': invoice.issue_date,
+    'Due Date': invoice.due_date || '',
+    'Status': invoice.status,
+    'Subtotal': invoice.subtotal,
+    'Tax Amount': invoice.tax_amount || 0,
+    'Discount': invoice.discount || 0,
+    'Total': invoice.total,
+    'Balance': invoice.balance,
+    'Paid to Date': invoice.paid_to_date || 0,
   }));
+};
+
+export const formatVATReportForExport = (invoices: any[]) => {
+  return invoices.map(invoice => ({
+    'Invoice Number': invoice.invoice_number,
+    'Invoice Date': invoice.issue_date,
+    'Net Amount': invoice.subtotal,
+    'VAT Rate': invoice.tax_rate_1 || 15,
+    'VAT Amount': invoice.tax_amount || 0,
+    'Gross Amount': invoice.total,
+    'Status': invoice.status,
+  }));
+};
+
+export const formatARAgingForExport = (invoices: any[], clients: any[]) => {
+  const today = new Date();
+  return invoices.map(invoice => {
+    const client = clients.find(c => c.id === invoice.client_id);
+    const dueDate = new Date(invoice.due_date || invoice.issue_date);
+    const daysOverdue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    let agingBucket = 'Current';
+    if (daysOverdue > 0) {
+      if (daysOverdue <= 30) agingBucket = '1-30 Days';
+      else if (daysOverdue <= 60) agingBucket = '31-60 Days';
+      else if (daysOverdue <= 90) agingBucket = '61-90 Days';
+      else agingBucket = '90+ Days';
+    }
+    
+    return {
+      'Client Name': client?.name || '',
+      'Invoice Number': invoice.invoice_number,
+      'Issue Date': invoice.issue_date,
+      'Due Date': invoice.due_date || '',
+      'Days Overdue': Math.max(0, daysOverdue),
+      'Aging Bucket': agingBucket,
+      'Balance': invoice.balance,
+      'Status': invoice.status,
+    };
+  });
+};
+
+export const formatProfitLossForExport = (invoices: any[], expenses: any[]) => {
+  const revenue = invoices.reduce((sum, inv) => sum + (inv.paid_to_date || 0), 0);
+  const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  
+  return [
+    { 'Category': 'REVENUE', 'Amount': revenue },
+    { 'Category': 'Total Revenue', 'Amount': revenue },
+    { 'Category': '', 'Amount': '' },
+    { 'Category': 'EXPENSES', 'Amount': '' },
+    ...expenses.map(exp => ({
+      'Category': exp.category,
+      'Amount': exp.amount
+    })),
+    { 'Category': 'Total Expenses', 'Amount': totalExpenses },
+    { 'Category': '', 'Amount': '' },
+    { 'Category': 'NET PROFIT/LOSS', 'Amount': revenue - totalExpenses },
+  ];
 };

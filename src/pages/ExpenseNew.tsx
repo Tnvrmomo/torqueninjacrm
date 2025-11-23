@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { logExpenseCreated } from "@/lib/activityLogger";
 
 const ExpenseNew = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const ExpenseNew = () => {
         .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
         .single();
 
-      const { error } = await supabase.from("expenses").insert({
+      const { data: expense, error } = await supabase.from("expenses").insert({
         company_id: profile?.company_id,
         expense_date: format(expenseDate, "yyyy-MM-dd"),
         category,
@@ -44,11 +45,13 @@ const ExpenseNew = () => {
         payment_method: paymentMethod,
         description,
         notes,
-      });
+      }).select().single();
 
       if (error) throw error;
+      return { id: expense?.id || '', category, amount: parseFloat(amount) };
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      await logExpenseCreated(data.id, data.category, data.amount);
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
       toast({ title: "Success", description: "Expense created successfully" });
       navigate("/expenses");

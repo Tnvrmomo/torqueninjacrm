@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Download } from "lucide-react";
-import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
+import { exportToCSV, formatSalesReportForExport, formatVATReportForExport, formatARAgingForExport, formatProfitLossForExport } from "@/lib/csvExport";
+import { logDataExported } from "@/lib/activityLogger";
 
 const Reports = () => {
   const [dateFrom, setDateFrom] = useState<Date>(startOfMonth(new Date()));
@@ -38,6 +40,54 @@ const Reports = () => {
       return data || [];
     },
   });
+
+  const { data: expensesData } = useQuery({
+    queryKey: ["expenses-report", dateFrom, dateTo],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("expenses")
+        .select("*")
+        .gte("expense_date", format(dateFrom, "yyyy-MM-dd"))
+        .lte("expense_date", format(dateTo, "yyyy-MM-dd"));
+      return data || [];
+    },
+  });
+
+  const { data: clients } = useQuery({
+    queryKey: ["clients"],
+    queryFn: async () => {
+      const { data } = await supabase.from("clients").select("*");
+      return data || [];
+    },
+  });
+
+  const handleExportSales = async () => {
+    if (!salesData || salesData.length === 0) return;
+    const formatted = formatSalesReportForExport(salesData);
+    exportToCSV(formatted, `sales_report_${format(dateFrom, 'yyyy-MM-dd')}_to_${format(dateTo, 'yyyy-MM-dd')}.csv`);
+    await logDataExported('sales_report', salesData.length);
+  };
+
+  const handleExportVAT = async () => {
+    if (!salesData || salesData.length === 0) return;
+    const formatted = formatVATReportForExport(salesData);
+    exportToCSV(formatted, `vat_report_${format(dateFrom, 'yyyy-MM-dd')}_to_${format(dateTo, 'yyyy-MM-dd')}.csv`);
+    await logDataExported('vat_report', salesData.length);
+  };
+
+  const handleExportARAging = async () => {
+    if (!salesData || salesData.length === 0) return;
+    const formatted = formatARAgingForExport(salesData, clients || []);
+    exportToCSV(formatted, `ar_aging_${format(dateFrom, 'yyyy-MM-dd')}_to_${format(dateTo, 'yyyy-MM-dd')}.csv`);
+    await logDataExported('ar_aging', salesData.length);
+  };
+
+  const handleExportPL = async () => {
+    if (!salesData || salesData.length === 0) return;
+    const formatted = formatProfitLossForExport(salesData, expensesData || []);
+    exportToCSV(formatted, `profit_loss_${format(dateFrom, 'yyyy-MM-dd')}_to_${format(dateTo, 'yyyy-MM-dd')}.csv`);
+    await logDataExported('profit_loss', 1);
+  };
 
   const formatBDT = (amount: number) => {
     return new Intl.NumberFormat("en-BD", {
@@ -131,7 +181,13 @@ const Reports = () => {
 
           <TabsContent value="sales">
             <Card className="p-6">
-              <h2 className="font-semibold text-lg mb-4">Sales Summary</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-semibold text-lg">Sales Summary</h2>
+                <Button variant="outline" size="sm" onClick={handleExportSales}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </div>
               <div className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
@@ -162,7 +218,13 @@ const Reports = () => {
 
           <TabsContent value="vat">
             <Card className="p-6">
-              <h2 className="font-semibold text-lg mb-4">VAT Report (Bangladesh)</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-semibold text-lg">VAT Report (Bangladesh)</h2>
+                <Button variant="outline" size="sm" onClick={handleExportVAT}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </div>
               <div className="space-y-4">
                 <div className="border-b pb-4">
                   <div className="text-sm text-muted-foreground mb-2">Period</div>
@@ -193,7 +255,13 @@ const Reports = () => {
 
           <TabsContent value="aging">
             <Card className="p-6">
-              <h2 className="font-semibold text-lg mb-4">Accounts Receivable Aging</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-semibold text-lg">Accounts Receivable Aging</h2>
+                <Button variant="outline" size="sm" onClick={handleExportARAging}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </div>
               <div className="space-y-4">
                 <div className="text-sm text-muted-foreground mb-4">Outstanding invoices by age</div>
                 <div className="grid md:grid-cols-4 gap-4">
@@ -223,7 +291,13 @@ const Reports = () => {
 
           <TabsContent value="pl">
             <Card className="p-6">
-              <h2 className="font-semibold text-lg mb-4">Profit & Loss Statement</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-semibold text-lg">Profit & Loss Statement</h2>
+                <Button variant="outline" size="sm" onClick={handleExportPL}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </div>
               <div className="space-y-6">
                 <div>
                   <div className="font-semibold mb-2">Revenue</div>

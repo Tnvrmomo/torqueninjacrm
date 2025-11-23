@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { logInvoiceCreated } from "@/lib/activityLogger";
 
 interface InvoiceItem {
   product_id?: string;
@@ -108,11 +109,12 @@ const InvoiceNew = () => {
 
       if (itemsError) throw itemsError;
 
-      return invoice.id;
+      return { id: invoice.id, number: invoiceNumber };
     },
-    onSuccess: (invoiceId) => {
+    onSuccess: async (data) => {
+      await logInvoiceCreated(data.id, data.number);
       toast({ title: "Success", description: "Invoice created successfully" });
-      navigate(`/invoices/${invoiceId}`);
+      navigate(`/invoices/${data.id}`);
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layout/MainLayout";
 import ProductForm from "@/components/products/ProductForm";
 import { useToast } from "@/hooks/use-toast";
+import { logProductCreated } from "@/lib/activityLogger";
 
 const ProductNew = () => {
   const navigate = useNavigate();
@@ -27,7 +28,8 @@ const ProductNew = () => {
       if (error) throw error;
       return product;
     },
-    onSuccess: (product) => {
+    onSuccess: async (product) => {
+      await logProductCreated(product.id, product.name);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast({
         title: "Success",

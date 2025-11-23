@@ -10,6 +10,8 @@ import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, Download, Mail, Edit, Trash2, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { generateInvoicePDF } from "@/lib/pdfGenerator";
+import { logInvoiceDeleted, logInvoicePDFDownloaded } from "@/lib/activityLogger";
 
 const InvoiceDetail = () => {
   const { id } = useParams();
@@ -28,13 +30,34 @@ const InvoiceDetail = () => {
     },
   });
 
+  const handleDownloadPDF = async () => {
+    if (!invoice) return;
+
+    const { data: company } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('id', invoice.company_id)
+      .single();
+
+    const pdf = generateInvoicePDF({
+      invoice,
+      client: invoice.clients,
+      company: company || {},
+      items: invoice.invoice_items || [],
+    });
+
+    pdf.save(`Invoice_${invoice.invoice_number}.pdf`);
+    await logInvoicePDFDownloaded(invoice.id, invoice.invoice_number);
+  };
+
   const deleteInvoiceMutation = useMutation({
     mutationFn: async () => {
       await supabase.from("invoice_items").delete().eq("invoice_id", id!);
       const { error } = await supabase.from("invoices").delete().eq("id", id!);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await logInvoiceDeleted(invoice?.invoice_number || 'Unknown');
       toast({ title: "Success", description: "Invoice deleted successfully" });
       navigate("/invoices");
     },
