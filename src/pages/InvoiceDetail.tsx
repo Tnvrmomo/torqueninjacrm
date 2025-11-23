@@ -89,8 +89,24 @@ const InvoiceDetail = () => {
     return colors[status] || "bg-muted";
   };
 
-  const downloadPDF = () => {
-    toast({ title: "Coming Soon", description: "PDF generation will be available soon" });
+  const downloadPDF = async () => {
+    if (!invoice || !invoice.clients) return;
+
+    const { data: company } = await supabase
+      .from("companies")
+      .select("*")
+      .eq("id", invoice.company_id)
+      .single();
+
+    const { generateInvoicePDF } = await import("@/lib/pdfGenerator");
+    const doc = generateInvoicePDF({
+      invoice,
+      client: invoice.clients,
+      company,
+      items: invoice.invoice_items || [],
+    });
+
+    doc.save(`Invoice-${invoice.invoice_number}.pdf`);
   };
 
   const sendEmail = () => {
