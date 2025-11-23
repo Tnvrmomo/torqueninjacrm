@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { PaymentGatewaySelector } from "@/components/billing/PaymentGatewaySelector";
+import { AIUsageBilling } from "@/components/billing/AIUsageBilling";
 import { format } from "date-fns";
 import { CreditCard, TrendingUp, Zap } from "lucide-react";
 
@@ -137,31 +138,9 @@ const Billing = () => {
           </CardContent>
         </Card>
 
-        {/* AI Usage */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5" />
-              AI Usage This Month
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Queries</p>
-                <p className="text-2xl font-bold">{Math.ceil(aiUsage.total / 100)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Cost (BDT)</p>
-                <p className="text-2xl font-bold">৳{aiUsage.cost_bdt.toFixed(2)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Cost (USD)</p>
-                <p className="text-2xl font-bold">${aiUsage.cost_usd.toFixed(2)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
+        {/* AI Usage Billing Component */}
+        <AIUsageBilling />
 
         {/* Payment History */}
         <Card>
