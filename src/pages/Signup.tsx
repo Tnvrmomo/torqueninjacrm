@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SubscriptionPlan {
   id: string;
@@ -19,6 +20,7 @@ interface SubscriptionPlan {
   features: any;
 }
 
+
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +31,14 @@ const Signup = () => {
   const [currency, setCurrency] = useState<"BDT" | "USD">("BDT");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isLoading } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/dashboard");
+    }
+  }, [user, isLoading, navigate]);
 
   useEffect(() => {
     fetchPlans();

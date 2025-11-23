@@ -2,10 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SubscriptionRoute } from "@/components/auth/SubscriptionRoute";
+import { AdminRoute } from "@/components/auth/AdminRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { lazy, Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -72,64 +73,85 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<ProtectedRoute><SubscriptionRoute><Dashboard /></SubscriptionRoute></ProtectedRoute>} />
-            <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
-            <Route path="/clients/new" element={<ProtectedRoute><ClientNew /></ProtectedRoute>} />
-            <Route path="/clients/:id" element={<ProtectedRoute><ClientDetail /></ProtectedRoute>} />
-            <Route path="/clients/:id/edit" element={<ProtectedRoute><ClientEdit /></ProtectedRoute>} />
-            <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
-            <Route path="/products/new" element={<ProtectedRoute><ProductNew /></ProtectedRoute>} />
-            <Route path="/products/:id" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
-            <Route path="/products/:id/edit" element={<ProtectedRoute><ProductEdit /></ProtectedRoute>} />
-            <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
-            <Route path="/invoices/new" element={<ProtectedRoute><InvoiceNew /></ProtectedRoute>} />
-            <Route path="/invoices/:id" element={<ProtectedRoute><InvoiceDetail /></ProtectedRoute>} />
-            <Route path="/invoices/:id/edit" element={<ProtectedRoute><InvoiceEdit /></ProtectedRoute>} />
-            <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
-            <Route path="/payments/new" element={<ProtectedRoute><PaymentNew /></ProtectedRoute>} />
-            <Route path="/payments/:id" element={<ProtectedRoute><PaymentDetail /></ProtectedRoute>} />
-            <Route path="/quotes" element={<ProtectedRoute><Quotes /></ProtectedRoute>} />
-            <Route path="/quotes/new" element={<ProtectedRoute><QuoteNew /></ProtectedRoute>} />
-            <Route path="/quotes/:id" element={<ProtectedRoute><QuoteDetail /></ProtectedRoute>} />
-            <Route path="/quotes/:id/edit" element={<ProtectedRoute><QuoteEdit /></ProtectedRoute>} />
-            <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
-            <Route path="/expenses/new" element={<ProtectedRoute><ExpenseNew /></ProtectedRoute>} />
-            <Route path="/expenses/:id" element={<ProtectedRoute><ExpenseDetail /></ProtectedRoute>} />
-            <Route path="/expenses/:id/edit" element={<ProtectedRoute><ExpenseEdit /></ProtectedRoute>} />
-            <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-            <Route path="/projects/new" element={<ProtectedRoute><ProjectNew /></ProtectedRoute>} />
-            <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
-            <Route path="/projects/:id/edit" element={<ProtectedRoute><ProjectEdit /></ProtectedRoute>} />
-            <Route path="/reports" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><Reports /></Suspense></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="/import" element={<ProtectedRoute><ImportData /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/activity-log" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
-            <Route path="/automation" element={<ProtectedRoute><Automation /></ProtectedRoute>} />
-            <Route path="/webhooks" element={<ProtectedRoute><Webhooks /></ProtectedRoute>} />
-            <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
-            <Route path="/dashboard-settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
-            <Route path="/api-keys" element={<ProtectedRoute><APIKeys /></ProtectedRoute>} />
-            <Route path="/notifications" element={<ProtectedRoute><SubscriptionRoute><Notifications /></SubscriptionRoute></ProtectedRoute>} />
-            
-            {/* Admin Routes - Lazy Loaded */}
-            <Route path="/admin/subscriptions" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminSubscriptions /></Suspense></ProtectedRoute>} />
-            <Route path="/admin/platform-settings" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><PlatformSettings /></Suspense></ProtectedRoute>} />
-            <Route path="/admin/domains" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><DomainManagement /></Suspense></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminUsers /></Suspense></ProtectedRoute>} />
-            <Route path="/custom-domain" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><CustomDomain /></Suspense></ProtectedRoute>} />
-            
-            <Route path="/client-portal" element={<ClientPortal />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+              {/* Public Routes */}
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/client-portal" element={<ClientPortal />} />
+              
+              {/* Protected Routes - Dashboard */}
+              <Route path="/dashboard" element={<ProtectedRoute><SubscriptionRoute><Dashboard /></SubscriptionRoute></ProtectedRoute>} />
+              
+              {/* Protected Routes - Clients */}
+              <Route path="/clients" element={<ProtectedRoute><SubscriptionRoute><Clients /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/clients/new" element={<ProtectedRoute><SubscriptionRoute><ClientNew /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/clients/:id" element={<ProtectedRoute><SubscriptionRoute><ClientDetail /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/clients/:id/edit" element={<ProtectedRoute><SubscriptionRoute><ClientEdit /></SubscriptionRoute></ProtectedRoute>} />
+              
+              {/* Protected Routes - Products */}
+              <Route path="/products" element={<ProtectedRoute><SubscriptionRoute><Products /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/products/new" element={<ProtectedRoute><SubscriptionRoute><ProductNew /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/products/:id" element={<ProtectedRoute><SubscriptionRoute><ProductDetail /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/products/:id/edit" element={<ProtectedRoute><SubscriptionRoute><ProductEdit /></SubscriptionRoute></ProtectedRoute>} />
+              
+              {/* Protected Routes - Invoices */}
+              <Route path="/invoices" element={<ProtectedRoute><SubscriptionRoute><Invoices /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/invoices/new" element={<ProtectedRoute><SubscriptionRoute><InvoiceNew /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/invoices/:id" element={<ProtectedRoute><SubscriptionRoute><InvoiceDetail /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/invoices/:id/edit" element={<ProtectedRoute><SubscriptionRoute><InvoiceEdit /></SubscriptionRoute></ProtectedRoute>} />
+              
+              {/* Protected Routes - Payments */}
+              <Route path="/payments" element={<ProtectedRoute><SubscriptionRoute><Payments /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/payments/new" element={<ProtectedRoute><SubscriptionRoute><PaymentNew /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/payments/:id" element={<ProtectedRoute><SubscriptionRoute><PaymentDetail /></SubscriptionRoute></ProtectedRoute>} />
+              
+              {/* Protected Routes - Quotes */}
+              <Route path="/quotes" element={<ProtectedRoute><SubscriptionRoute><Quotes /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/quotes/new" element={<ProtectedRoute><SubscriptionRoute><QuoteNew /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/quotes/:id" element={<ProtectedRoute><SubscriptionRoute><QuoteDetail /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/quotes/:id/edit" element={<ProtectedRoute><SubscriptionRoute><QuoteEdit /></SubscriptionRoute></ProtectedRoute>} />
+              
+              {/* Protected Routes - Expenses */}
+              <Route path="/expenses" element={<ProtectedRoute><SubscriptionRoute><Expenses /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/expenses/new" element={<ProtectedRoute><SubscriptionRoute><ExpenseNew /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/expenses/:id" element={<ProtectedRoute><SubscriptionRoute><ExpenseDetail /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/expenses/:id/edit" element={<ProtectedRoute><SubscriptionRoute><ExpenseEdit /></SubscriptionRoute></ProtectedRoute>} />
+              
+              {/* Protected Routes - Projects */}
+              <Route path="/projects" element={<ProtectedRoute><SubscriptionRoute><Projects /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/projects/new" element={<ProtectedRoute><SubscriptionRoute><ProjectNew /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/projects/:id" element={<ProtectedRoute><SubscriptionRoute><ProjectDetail /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/projects/:id/edit" element={<ProtectedRoute><SubscriptionRoute><ProjectEdit /></SubscriptionRoute></ProtectedRoute>} />
+              
+              {/* Protected Routes - Other Features */}
+              <Route path="/reports" element={<ProtectedRoute><SubscriptionRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><Reports /></Suspense></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/automation" element={<ProtectedRoute><SubscriptionRoute><Automation /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/webhooks" element={<ProtectedRoute><SubscriptionRoute><Webhooks /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/api-keys" element={<ProtectedRoute><SubscriptionRoute><APIKeys /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/notifications" element={<ProtectedRoute><SubscriptionRoute><Notifications /></SubscriptionRoute></ProtectedRoute>} />
+              
+              {/* Protected Routes - Settings & Profile */}
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
+              <Route path="/dashboard-settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
+              <Route path="/import" element={<ProtectedRoute><ImportData /></ProtectedRoute>} />
+              <Route path="/activity-log" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
+              <Route path="/custom-domain" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><CustomDomain /></Suspense></ProtectedRoute>} />
+              
+              {/* Admin Routes - Protected by AdminRoute */}
+              <Route path="/admin/subscriptions" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminSubscriptions /></Suspense></AdminRoute>} />
+              <Route path="/admin/platform-settings" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><PlatformSettings /></Suspense></AdminRoute>} />
+              <Route path="/admin/domains" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><DomainManagement /></Suspense></AdminRoute>} />
+              <Route path="/admin/users" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminUsers /></Suspense></AdminRoute>} />
+              
+              {/* 404 Catch-All */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   </ErrorBoundary>
 );
 
