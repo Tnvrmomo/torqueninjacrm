@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,9 +8,11 @@ import RecentActivity from "@/components/dashboard/RecentActivity";
 import QuickActions from "@/components/dashboard/QuickActions";
 import StockSummaryWidget from "@/components/dashboard/StockSummaryWidget";
 import AIInsightsWidget from "@/components/dashboard/AIInsightsWidget";
+import { PaymentModal } from "@/components/billing/PaymentModal";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, subscription } = useAuth();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   
   const { data: customization } = useQuery({
     queryKey: ['dashboard-customization', user?.id],
@@ -38,6 +41,17 @@ const Dashboard = () => {
   const visibleModules = (customization?.visible_modules as string[]) || 
     ['inventory', 'quotes', 'invoices', 'clients', 'analytics'];
   
+  // Show payment modal after 30 seconds on dashboard for trial users
+  useEffect(() => {
+    if (subscription?.status === 'trial') {
+      const timer = setTimeout(() => {
+        setShowPaymentModal(true);
+      }, 30000); // 30 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [subscription]);
+  
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -63,6 +77,11 @@ const Dashboard = () => {
           <AIInsightsWidget />
         )}
       </div>
+
+      <PaymentModal 
+        show={showPaymentModal} 
+        onClose={() => setShowPaymentModal(false)} 
+      />
     </MainLayout>
   );
 };
