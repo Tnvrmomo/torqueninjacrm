@@ -1,10 +1,1 @@
-project_id = "xfebslniueszikluqtag"
-
-[functions.process-recurring-invoices]
-verify_jwt = false
-
-[functions.trigger-webhook]
-verify_jwt = false
-
-[functions.send-invoice-email]
-verify_jwt = false
+project_id = "krphkpliaoitytorrpcv"
