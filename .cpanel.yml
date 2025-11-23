@@ -1,5 +1,21 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/username/public_html/crm
+    # IMPORTANT: Update the path below to match your cPanel directory structure
+    # Common paths:
+    # - /home/yourusername/public_html (for main domain)
+    # - /home/yourusername/public_html/subdirectory (for subdomain or subfolder)
+    # Replace 'yourusername' with your actual cPanel username
+    - export DEPLOYPATH=/home/yourusername/public_html
+    
+    # Copy all built files to deployment directory
     - /bin/cp -R dist/* $DEPLOYPATH
+    
+    # Copy .htaccess for proper routing
+    - /bin/cp public/.htaccess $DEPLOYPATH/.htaccess
+    
+    # Set proper permissions
+    - /bin/chmod -R 755 $DEPLOYPATH
+    
+    # Verify deployment
+    - /bin/ls -la $DEPLOYPATH

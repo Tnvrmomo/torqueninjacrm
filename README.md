@@ -60,9 +60,106 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## 🚀 Deployment Options
 
-Simply open [Lovable](https://lovable.dev/projects/a8f0bcd3-8769-487e-b9bd-a829b76e2dad) and click on Share -> Publish.
+TorqueNinja can be deployed to multiple platforms. Choose the one that fits your needs:
+
+### Quick Deploy Options
+
+| Platform | Difficulty | Speed | Cost | Best For |
+|----------|-----------|-------|------|----------|
+| **[Vercel](deployments/vercel/README.md)** | Easy | ⚡ Fastest | Free tier | Quick deployments, automatic scaling |
+| **[Netlify](deployments/netlify/README.md)** | Easy | ⚡ Fast | Free tier | GitHub Actions, CI/CD workflows |
+| **[cPanel](deployments/cpanel/README.md)** | Medium | 🐢 Manual | Varies | Shared hosting, existing infrastructure |
+
+### Detailed Deployment Guides
+
+Each deployment option has a comprehensive guide in the `deployments/` folder:
+
+- **📁 deployments/vercel/** - Vercel deployment via dashboard or CLI
+- **📁 deployments/netlify/** - Netlify with GitHub Actions automation
+- **📁 deployments/cpanel/** - cPanel File Manager and Git deployment
+
+See [Deployment Test Checklist](deployments/TEST_CHECKLIST.md) for post-deployment verification.
+
+---
+
+## 🔧 Environment Variables
+
+This project requires the following environment variables:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+VITE_SUPABASE_PROJECT_ID=your_supabase_project_id
+```
+
+**Local Development:**
+1. Copy `.env.example` to `.env`
+2. Fill in your Supabase credentials
+3. Never commit `.env` to Git!
+
+**Production Deployment:**
+- **Vercel/Netlify:** Set in dashboard under Environment Variables
+- **cPanel:** Create `.env.production` file (see cPanel deployment guide)
+
+---
+
+## 🏗️ Build Commands
+
+```bash
+# Install dependencies
+npm install
+
+# Development server (localhost:8080)
+npm run dev
+
+# Production build
+npm run build
+
+# Preview production build locally
+npm run preview
+
+# Platform-specific builds
+npm run build:vercel   # Build for Vercel
+npm run build:netlify  # Build for Netlify
+npm run build:cpanel   # Build for cPanel
+```
+
+---
+
+## 📱 Browser Support
+
+- Chrome/Edge (latest 2 versions)
+- Firefox (latest 2 versions)
+- Safari (latest 2 versions)
+- Mobile browsers (iOS Safari, Chrome Android)
+
+---
+
+## 🐛 Troubleshooting Deployment Issues
+
+### Blank Page After Deployment
+**Cause:** Missing environment variables or routing configuration  
+**Fix:** 
+1. Verify all environment variables are set
+2. Check deployment logs for build errors
+3. Ensure `.htaccess` (cPanel) or `vercel.json` exists
+
+### 404 on Page Refresh
+**Cause:** Missing SPA routing configuration  
+**Fix:**
+- **Vercel:** Ensure `vercel.json` is in repository
+- **Netlify:** Ensure `netlify.toml` has `[[redirects]]` section
+- **cPanel:** Ensure `.htaccess` has rewrite rules
+
+### Authentication Doesn't Work
+**Cause:** Incorrect Supabase credentials  
+**Fix:** Double-check environment variables match your Supabase project
+
+For more troubleshooting, see individual deployment guides.
+
+---
 
 ## Can I connect a custom domain to my Lovable project?
 
