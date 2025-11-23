@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.trigger-webhook]
 verify_jwt = false
+
+[functions.send-invoice-email]
+verify_jwt = false

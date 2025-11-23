@@ -19,14 +19,25 @@ import ProductEdit from "./pages/ProductEdit";
 import Invoices from "./pages/Invoices";
 import InvoiceNew from "./pages/InvoiceNew";
 import InvoiceDetail from "./pages/InvoiceDetail";
+import InvoiceEdit from "./pages/InvoiceEdit";
 import Payments from "./pages/Payments";
 import PaymentNew from "./pages/PaymentNew";
+import PaymentDetail from "./pages/PaymentDetail";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import ImportData from "./pages/ImportData";
 import Quotes from "./pages/Quotes";
+import QuoteNew from "./pages/QuoteNew";
+import QuoteDetail from "./pages/QuoteDetail";
+import QuoteEdit from "./pages/QuoteEdit";
 import Expenses from "./pages/Expenses";
+import ExpenseNew from "./pages/ExpenseNew";
+import ExpenseDetail from "./pages/ExpenseDetail";
+import ExpenseEdit from "./pages/ExpenseEdit";
 import Projects from "./pages/Projects";
+import ProjectNew from "./pages/ProjectNew";
+import ProjectDetail from "./pages/ProjectDetail";
+import ProjectEdit from "./pages/ProjectEdit";
 import Profile from "./pages/Profile";
 import ActivityLog from "./pages/ActivityLog";
 import ClientPortal from "./pages/ClientPortal";
@@ -59,11 +70,22 @@ const App = () => (
             <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
             <Route path="/invoices/new" element={<ProtectedRoute><InvoiceNew /></ProtectedRoute>} />
             <Route path="/invoices/:id" element={<ProtectedRoute><InvoiceDetail /></ProtectedRoute>} />
+            <Route path="/invoices/:id/edit" element={<ProtectedRoute><InvoiceEdit /></ProtectedRoute>} />
             <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
             <Route path="/payments/new" element={<ProtectedRoute><PaymentNew /></ProtectedRoute>} />
+            <Route path="/payments/:id" element={<ProtectedRoute><PaymentDetail /></ProtectedRoute>} />
             <Route path="/quotes" element={<ProtectedRoute><Quotes /></ProtectedRoute>} />
+            <Route path="/quotes/new" element={<ProtectedRoute><QuoteNew /></ProtectedRoute>} />
+            <Route path="/quotes/:id" element={<ProtectedRoute><QuoteDetail /></ProtectedRoute>} />
+            <Route path="/quotes/:id/edit" element={<ProtectedRoute><QuoteEdit /></ProtectedRoute>} />
             <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
+            <Route path="/expenses/new" element={<ProtectedRoute><ExpenseNew /></ProtectedRoute>} />
+            <Route path="/expenses/:id" element={<ProtectedRoute><ExpenseDetail /></ProtectedRoute>} />
+            <Route path="/expenses/:id/edit" element={<ProtectedRoute><ExpenseEdit /></ProtectedRoute>} />
             <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+            <Route path="/projects/new" element={<ProtectedRoute><ProjectNew /></ProtectedRoute>} />
+            <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+            <Route path="/projects/:id/edit" element={<ProtectedRoute><ProjectEdit /></ProtectedRoute>} />
             <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/import" element={<ProtectedRoute><ImportData /></ProtectedRoute>} />
