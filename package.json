@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "prepare:cpanel": "bash scripts/prepare-cpanel-deploy-branch.sh",
+    "prepare:cpanel:clean": "bash scripts/prepare-cpanel-clean-branch.sh",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
