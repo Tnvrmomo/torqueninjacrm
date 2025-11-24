@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import bcrypt from "bcryptjs";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -78,12 +79,16 @@ const APIKeys = () => {
 
       const key = generateKey();
       const keyPreview = key.substring(0, 12) + "...";
+      
+      // Security fix: Hash API key before storing
+      const saltRounds = 10;
+      const keyHash = await bcrypt.hash(key, saltRounds);
 
       const { error } = await supabase.from("api_keys").insert([
         {
           ...data,
           company_id: profile?.company_id,
-          key_hash: key,
+          key_hash: keyHash,
           key_preview: keyPreview,
         },
       ]);
