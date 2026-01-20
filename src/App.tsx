@@ -13,6 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Clients from "./pages/Clients";
 import ClientNew from "./pages/ClientNew";
 import ClientDetail from "./pages/ClientDetail";
@@ -87,6 +89,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/verify-pending" element={<VerifyPending />} />
               <Route path="/payment/success" element={<PaymentSuccess />} />
