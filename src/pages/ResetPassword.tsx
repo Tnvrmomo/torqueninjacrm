@@ -14,31 +14,47 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check for access token in URL hash
+    // Recovery links arrive with tokens in URL hash
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const token = hashParams.get('access_token');
-    const type = hashParams.get('type');
+    const access_token = hashParams.get("access_token");
+    const refresh_token = hashParams.get("refresh_token");
+    const type = hashParams.get("type");
 
-    if (token && type === 'recovery') {
-      setAccessToken(token);
-    } else {
-      // Check if user is already authenticated via recovery
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!session) {
+    const bootstrapRecoverySession = async () => {
+      if (access_token && refresh_token && type === "recovery") {
+        const { error } = await supabase.auth.setSession({
+          access_token,
+          refresh_token,
+        });
+
+        if (error) {
           toast({
             title: "Invalid or Expired Link",
             description: "Please request a new password reset link.",
             variant: "destructive",
           });
-          navigate('/forgot-password');
+          navigate("/forgot-password");
         }
-      });
-    }
+        return;
+      }
+
+      // If no tokens, ensure there is an active session (some clients auto-hydrate)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Invalid or Expired Link",
+          description: "Please request a new password reset link.",
+          variant: "destructive",
+        });
+        navigate("/forgot-password");
+      }
+    };
+
+    bootstrapRecoverySession();
   }, [navigate, toast]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
