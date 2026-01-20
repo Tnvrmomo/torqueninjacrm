@@ -1,53 +1,65 @@
-# TorqueNinja cPanel Deployment Guide
+# NinjaCRM cPanel Deployment Guide
 **Subdomain**: cms.torquesticker.com
 
-## ✅ Security Fixes Applied
+## ✅ What's Included
 
-1. **API Keys**: Now hashed with bcrypt before storage
-2. **Stripe Webhook**: Added explicit signature validation
-3. **Database Validation**: Server-side constraints for emails, URLs, lengths
-4. **RLS Policies**: Removed redundant auth-only policies
-5. **HTTPS**: Force HTTPS redirect in .htaccess
+1. **Frontend**: React/Vite app built for production
+2. **Backend**: PHP API with MySQL database
+3. **Database**: Complete MySQL schema with admin user
+4. **Security**: JWT authentication, bcrypt passwords, HTTPS redirect
 
-## 📦 Deployment Steps
+## 📦 Deployment Files
 
-### 1. Build for Production
-```bash
-# Copy production environment
-cp deployments/cpanel/.env.production .env
+- `ninjacrm.zip` - Frontend application
+- `php-api.zip` - PHP backend API
+- `ninjacrm.sql` - MySQL database schema
 
-# Install dependencies
-npm install
+## 🚀 Deployment Steps
 
-# Build
-npm run build
-```
+### 1. Database Setup
+1. Create a MySQL database in cPanel named `torquest_cms`
+2. Import `ninjacrm.sql` via PHPMyAdmin
+3. Note the database credentials
 
-### 2. Prepare Deployment Package
-```bash
-# Copy .htaccess to dist
-cp deployments/cpanel/.htaccess dist/.htaccess
+### 2. Deploy PHP API
+1. Create a subdomain or directory for the API (e.g., `api.cms.torquesticker.com`)
+2. Upload `php-api.zip` and extract
+3. Update `php-api/.env` with your database credentials:
+   ```
+   DB_HOST=localhost
+   DB_NAME=torquest_cms
+   DB_USER=torquest_cms
+   DB_PASS=k73k7WxLj1
+   JWT_SECRET=ZtNr0DSVfuHxGuTbkaPCAWE62fQmEmAa0kJo1cIzYA=
+   ```
+4. Ensure PHP 7.4+ with PDO MySQL extension
 
-# Create ZIP (from within dist folder)
-cd dist
-zip -r ../torqueninja-production.zip *
-cd ..
-```
-
-### 3. Upload to cPanel
-
+### 3. Deploy Frontend
 1. **Login to cPanel** at your hosting provider
 2. **Navigate to File Manager**
 3. **Go to**: `/public_html/cms/` (for subdomain cms.torquesticker.com)
-4. **Backup existing files** (if any):
-   - Select all → Compress → Download
-   - Delete old files
-5. **Upload ZIP**: Click Upload → Select `torqueninja-production.zip`
+4. **Backup existing files** (if any)
+5. **Upload ZIP**: Click Upload → Select `ninjacrm.zip`
 6. **Extract**: Right-click ZIP → Extract → Extract to `/public_html/cms/`
 7. **Delete ZIP** after extraction
 8. **Set Permissions**:
    - Folders: 755
    - Files: 644
+
+### 4. Configure Frontend
+Update the API URL in the frontend if needed (already configured for `https://cms.torquesticker.com/api`)
+
+## 🔐 Admin Access
+
+- **Email**: admin@ninjacrm.com
+- **Password**: admin1234
+
+## 🛠 Troubleshooting
+
+- Ensure PHP API is accessible
+- Check database connection in PHP logs
+- Verify CORS headers if needed
+- Test login with admin credentials
    - Check "Recurse into subdirectories"
 
 ### 4. SSL Certificate
