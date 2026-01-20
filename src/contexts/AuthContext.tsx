@@ -84,32 +84,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await fetchSubscription(session.user.id);
-        } else {
-          setSubscription(null);
-        }
-        
-        setIsLoading(false);
-      }
-    );
+    const handleSession = (nextSession: Session | null) => {
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
 
-    // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await fetchSubscription(session.user.id);
+      if (nextSession?.user) {
+        // IMPORTANT: defer any database calls to avoid auth callback deadlocks
+        setTimeout(() => {
+          fetchSubscription(nextSession.user.id);
+        }, 0);
+      } else {
+        setSubscription(null);
       }
-      
+
       setIsLoading(false);
+    };
+
+    // Set up auth state listener FIRST
+    const {
+      data: { subscription: authSubscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      handleSession(nextSession);
+    });
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      handleSession(existingSession);
     });
 
     return () => authSubscription.unsubscribe();

@@ -83,23 +83,23 @@ const Signup = () => {
       return;
     }
 
-    // Check if email confirmation is required
-    if (authData.user && !authData.user.email_confirmed_at && authData.user.identities?.length === 0) {
+    // If email confirmation is required, send user to pending screen
+    if (authData.user && !authData.user.email_confirmed_at) {
       toast({
         title: "Check Your Email",
         description: "Please verify your email address to continue.",
       });
       navigate("/verify-pending");
-    } else {
-      toast({
-        title: "Success!",
-        description: "Your account has been created with a 7-day trial.",
-      });
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 500);
+      setLoading(false);
+      return;
     }
-    
+
+    toast({
+      title: "Success!",
+      description: "Your account has been created.",
+    });
+
+    navigate("/dashboard");
     setLoading(false);
   };
 
