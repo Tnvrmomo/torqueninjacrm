@@ -14,77 +14,54 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, isLoading } = useAuth();
+  const { user, role, isLoading } = useAuth();
 
   // Redirect if already logged in
   useEffect(() => {
-    if (!isLoading && user) {
-      navigate("/dashboard");
+    if (!isLoading && user && role) {
+      // Redirect based on role
+      if (role === 'super_admin') {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     }
-  }, [user, isLoading, navigate]);
+  }, [user, role, isLoading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      toast({
-        title: "Login Failed",
-        description: error.message,
-        variant: "destructive",
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      setLoading(false);
-      return;
-    }
 
-    // Check if user has profile and company
-    if (data.user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("company_id")
-        .eq("user_id", data.user.id)
-        .single();
-
-      if (!profile) {
+      if (error) {
         toast({
-          title: "Account Setup Error",
-          description: "Your account is incomplete. Please contact support.",
+          title: "Login Failed",
+          description: error.message,
           variant: "destructive",
         });
         setLoading(false);
         return;
       }
 
-      // Check email verification (if required)
-      if (!data.user.email_confirmed_at) {
-        navigate("/verify-pending");
-        setLoading(false);
-        return;
-      }
-
-      // Check user role for redirection
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', data.user.id)
-        .single();
-
+      // Success - AuthContext will handle the redirect
       toast({
         title: "Success",
         description: "Logged in successfully",
       });
 
-      // Redirect based on role
-      if (roleData?.role === 'super_admin') {
-        navigate("/admin");
-      } else {
-        navigate("/dashboard");
-      }
+      setLoading(false);
+    } catch (err) {
+      toast({
+        title: "Login Failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      setLoading(false);
     }
   };
 

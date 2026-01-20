@@ -24,6 +24,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   subscription: CompanySubscription | null;
+  role: string | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
@@ -35,6 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [subscription, setSubscription] = useState<CompanySubscription | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchSubscription = async (userId: string) => {
@@ -77,9 +79,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const refreshSubscription = async () => {
-    if (user) {
-      await fetchSubscription(user.id);
+  const fetchRole = async (userId: string) => {
+    try {
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      setRole(roleData?.role || 'user');
+    } catch (err) {
+      console.error('Role fetch error:', err);
+      setRole('user');
     }
   };
 
@@ -92,8 +103,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         if (session?.user) {
           await fetchSubscription(session.user.id);
+          await fetchRole(session.user.id);
         } else {
           setSubscription(null);
+          setRole(null);
         }
         
         setIsLoading(false);
@@ -107,6 +120,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (session?.user) {
         await fetchSubscription(session.user.id);
+        await fetchRole(session.user.id);
       }
       
       setIsLoading(false);
@@ -121,7 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, subscription, isLoading, signOut, refreshSubscription }}>
+    <AuthContext.Provider value={{ user, session, subscription, role, isLoading, signOut, refreshSubscription }}>
       {children}
     </AuthContext.Provider>
   );

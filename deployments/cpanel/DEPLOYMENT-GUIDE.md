@@ -22,7 +22,7 @@
 3. Note the database credentials
 
 ### 2. Deploy PHP API
-1. Create a subdomain or directory for the API (e.g., `api.cms.torquesticker.com`)
+1. Create a subdomain or directory for the API (e.g., `api.cms.torquesticker.com` or `cms.torquesticker.com/api`)
 2. Upload `php-api.zip` and extract
 3. Update `php-api/.env` with your database credentials:
    ```

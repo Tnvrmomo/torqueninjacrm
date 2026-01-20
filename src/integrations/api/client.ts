@@ -51,6 +51,8 @@ class ApiClient {
     });
     if (response.data?.session?.access_token) {
       this.setToken(response.data.session.access_token);
+      // Dispatch custom event to trigger auth state change
+      window.dispatchEvent(new CustomEvent('auth-token-changed'));
     }
     return response;
   }
@@ -62,6 +64,8 @@ class ApiClient {
     });
     if (response.data?.session?.access_token) {
       this.setToken(response.data.session.access_token);
+      // Dispatch custom event to trigger auth state change
+      window.dispatchEvent(new CustomEvent('auth-token-changed'));
     }
     return response;
   }
@@ -168,6 +172,8 @@ export const auth = {
   },
   signOut: () => {
     api.clearToken();
+    // Dispatch custom event to trigger auth state change
+    window.dispatchEvent(new CustomEvent('auth-token-changed'));
     return Promise.resolve();
   },
   onAuthStateChange: (callback: (event: string, session: any) => void) => {
@@ -212,7 +218,13 @@ export const auth = {
       }
     };
 
+    // Listen for custom auth token change event
+    const handleAuthTokenChange = () => {
+      checkAuthState();
+    };
+
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('auth-token-changed', handleAuthTokenChange);
 
     // Return Supabase-compatible subscription object
     return {
@@ -220,6 +232,7 @@ export const auth = {
         subscription: {
           unsubscribe: () => {
             window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('auth-token-changed', handleAuthTokenChange);
           }
         }
       }
