@@ -77,6 +77,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { name: "Clients", href: "/clients", icon: Users },
     { name: "Products", href: "/products", icon: Package },
     { name: "Invoices", href: "/invoices", icon: FileText },
+    { name: "Recurring", href: "/recurring-invoices", icon: Zap },
     { name: "Quotes", href: "/quotes", icon: FileCheck },
     { name: "Payments", href: "/payments", icon: CreditCard },
     { name: "Expenses", href: "/expenses", icon: Receipt },
@@ -86,6 +87,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { name: "Automation", href: "/automation", icon: Zap },
     { name: "Webhooks", href: "/webhooks", icon: Webhook },
     { name: "API Keys", href: "/api-keys", icon: Key },
+    { name: "Invoice Settings", href: "/invoice-settings", icon: FileText },
     { name: "Settings", href: "/settings", icon: Settings },
   ];
 
@@ -94,6 +96,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { name: "Users", href: "/admin/users", icon: UserCog },
     { name: "Subscriptions", href: "/admin/subscriptions", icon: CreditCard },
     { name: "Platform Settings", href: "/admin/platform-settings", icon: Shield },
+    { name: "Invoice Templates", href: "/admin/invoice-templates", icon: FileText },
     { name: "Domains", href: "/admin/domains", icon: Globe },
     { name: "API Keys", href: "/admin/api-keys", icon: Key },
     { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },

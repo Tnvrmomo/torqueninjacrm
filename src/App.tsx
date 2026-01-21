@@ -60,6 +60,8 @@ import VerifyPending from "./pages/VerifyPending";
 import AIUsage from "./pages/AIUsage";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
+import InvoiceSettings from "./pages/InvoiceSettings";
+import RecurringInvoices from "./pages/RecurringInvoices";
 
 // Lazy load heavy pages for better performance
 const Reports = lazy(() => import("./pages/Reports"));
@@ -73,6 +75,7 @@ const AdminAPIKeys = lazy(() => import("./pages/admin/APIKeysManagement"));
 const AdminAnalytics = lazy(() => import("./pages/admin/Analytics"));
 const AdminPaymentGateways = lazy(() => import("./pages/admin/PaymentGateways"));
 const AdminUserPasswordReset = lazy(() => import("./pages/admin/UserPasswordReset"));
+const AdminInvoiceTemplates = lazy(() => import("./pages/admin/InvoiceTemplates"));
 
 const queryClient = new QueryClient();
 
@@ -157,6 +160,8 @@ const App = () => (
               <Route path="/import" element={<ProtectedRoute><ImportData /></ProtectedRoute>} />
               <Route path="/activity-log" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
               <Route path="/custom-domain" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><CustomDomain /></Suspense></ProtectedRoute>} />
+              <Route path="/invoice-settings" element={<ProtectedRoute><SubscriptionRoute><InvoiceSettings /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/recurring-invoices" element={<ProtectedRoute><SubscriptionRoute><RecurringInvoices /></SubscriptionRoute></ProtectedRoute>} />
               
               {/* Admin Routes - Protected by AdminRoute */}
               <Route path="/admin" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminDashboard /></Suspense></AdminRoute>} />
@@ -168,6 +173,7 @@ const App = () => (
               <Route path="/admin/analytics" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminAnalytics /></Suspense></AdminRoute>} />
               <Route path="/admin/payment-gateways" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminPaymentGateways /></Suspense></AdminRoute>} />
               <Route path="/admin/password-reset" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminUserPasswordReset /></Suspense></AdminRoute>} />
+              <Route path="/admin/invoice-templates" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminInvoiceTemplates /></Suspense></AdminRoute>} />
               
               {/* 404 Catch-All */}
               <Route path="*" element={<NotFound />} />
