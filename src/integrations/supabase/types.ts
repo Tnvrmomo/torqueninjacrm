@@ -708,6 +708,80 @@ export type Database = {
           },
         ]
       }
+      invoice_templates: {
+        Row: {
+          accent_color: string | null
+          bank_details: Json | null
+          company_id: string | null
+          created_at: string | null
+          footer_text: string | null
+          header_text: string | null
+          id: string
+          is_default: boolean | null
+          logo_position: string | null
+          name: string
+          payment_instructions: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          show_bank_details: boolean | null
+          show_payment_instructions: boolean | null
+          show_qr_code: boolean | null
+          template_type: string | null
+          terms_text: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          accent_color?: string | null
+          bank_details?: Json | null
+          company_id?: string | null
+          created_at?: string | null
+          footer_text?: string | null
+          header_text?: string | null
+          id?: string
+          is_default?: boolean | null
+          logo_position?: string | null
+          name: string
+          payment_instructions?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          show_bank_details?: boolean | null
+          show_payment_instructions?: boolean | null
+          show_qr_code?: boolean | null
+          template_type?: string | null
+          terms_text?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          accent_color?: string | null
+          bank_details?: Json | null
+          company_id?: string | null
+          created_at?: string | null
+          footer_text?: string | null
+          header_text?: string | null
+          id?: string
+          is_default?: boolean | null
+          logo_position?: string | null
+          name?: string
+          payment_instructions?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          show_bank_details?: boolean | null
+          show_payment_instructions?: boolean | null
+          show_qr_code?: boolean | null
+          template_type?: string | null
+          terms_text?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_templates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           auto_bill: string | null
