@@ -62,6 +62,8 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
 import InvoiceSettings from "./pages/InvoiceSettings";
 import RecurringInvoices from "./pages/RecurringInvoices";
+import Leads from "./pages/Leads";
+import Campaigns from "./pages/Campaigns";
 
 // Lazy load heavy pages for better performance
 const Reports = lazy(() => import("./pages/Reports"));
@@ -162,6 +164,8 @@ const App = () => (
               <Route path="/custom-domain" element={<ProtectedRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><CustomDomain /></Suspense></ProtectedRoute>} />
               <Route path="/invoice-settings" element={<ProtectedRoute><SubscriptionRoute><InvoiceSettings /></SubscriptionRoute></ProtectedRoute>} />
               <Route path="/recurring-invoices" element={<ProtectedRoute><SubscriptionRoute><RecurringInvoices /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/leads" element={<ProtectedRoute><SubscriptionRoute><Leads /></SubscriptionRoute></ProtectedRoute>} />
+              <Route path="/campaigns" element={<ProtectedRoute><SubscriptionRoute><Campaigns /></SubscriptionRoute></ProtectedRoute>} />
               
               {/* Admin Routes - Protected by AdminRoute */}
               <Route path="/admin" element={<AdminRoute><Suspense fallback={<Skeleton className="h-screen w-full" />}><AdminDashboard /></Suspense></AdminRoute>} />

@@ -182,6 +182,63 @@ export type Database = {
           },
         ]
       }
+      campaign_emails: {
+        Row: {
+          bounced_at: string | null
+          campaign_id: string | null
+          clicked_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          lead_id: string | null
+          mailgun_message_id: string | null
+          opened_at: string | null
+          sent_at: string | null
+          status: string | null
+        }
+        Insert: {
+          bounced_at?: string | null
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          lead_id?: string | null
+          mailgun_message_id?: string | null
+          opened_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          bounced_at?: string | null
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          lead_id?: string | null
+          mailgun_message_id?: string | null
+          opened_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_emails_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "lead_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_emails_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_portal_access: {
         Row: {
           client_id: string
@@ -953,6 +1010,157 @@ export type Database = {
             columns: ["parent_invoice_id"]
             isOneToOne: false
             referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_campaigns: {
+        Row: {
+          body_html: string
+          body_text: string | null
+          company_id: string | null
+          created_at: string | null
+          from_email: string | null
+          from_name: string | null
+          id: string
+          name: string
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string | null
+          subject: string
+          total_bounced: number | null
+          total_clicked: number | null
+          total_opened: number | null
+          total_recipients: number | null
+          total_sent: number | null
+          total_unsubscribed: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          body_html: string
+          body_text?: string | null
+          company_id?: string | null
+          created_at?: string | null
+          from_email?: string | null
+          from_name?: string | null
+          id?: string
+          name: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+          total_bounced?: number | null
+          total_clicked?: number | null
+          total_opened?: number | null
+          total_recipients?: number | null
+          total_sent?: number | null
+          total_unsubscribed?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          body_html?: string
+          body_text?: string | null
+          company_id?: string | null
+          created_at?: string | null
+          from_email?: string | null
+          from_name?: string | null
+          id?: string
+          name?: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+          total_bounced?: number | null
+          total_clicked?: number | null
+          total_opened?: number | null
+          total_recipients?: number | null
+          total_sent?: number | null
+          total_unsubscribed?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_campaigns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          ai_category: string | null
+          ai_notes: string | null
+          ai_score: number | null
+          company_id: string | null
+          company_name: string | null
+          company_size: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          industry: string | null
+          name: string | null
+          phone: string | null
+          social_facebook: string | null
+          social_linkedin: string | null
+          social_twitter: string | null
+          source_url: string | null
+          status: string | null
+          tags: string[] | null
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          ai_category?: string | null
+          ai_notes?: string | null
+          ai_score?: number | null
+          company_id?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          industry?: string | null
+          name?: string | null
+          phone?: string | null
+          social_facebook?: string | null
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          source_url?: string | null
+          status?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          ai_category?: string | null
+          ai_notes?: string | null
+          ai_score?: number | null
+          company_id?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          industry?: string | null
+          name?: string | null
+          phone?: string | null
+          social_facebook?: string | null
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          source_url?: string | null
+          status?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
