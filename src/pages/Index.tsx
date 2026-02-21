@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   Package, 
   FileText, 
@@ -24,6 +25,13 @@ import {
 const Index = () => {
   const navigate = useNavigate();
   const [demoLoading, setDemoLoading] = useState(false);
+  const { user, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, isLoading, navigate]);
 
   const handleDemoLogin = async () => {
     setDemoLoading(true);
