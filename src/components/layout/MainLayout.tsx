@@ -25,7 +25,9 @@ import {
   Globe,
   UserCog,
   DollarSign,
-  ChevronDown
+  ChevronDown,
+  Crosshair,
+  Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -82,6 +84,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { name: "Payments", href: "/payments", icon: CreditCard },
     { name: "Expenses", href: "/expenses", icon: Receipt },
     { name: "Projects", href: "/projects", icon: FolderKanban },
+    { name: "Leads", href: "/leads", icon: Crosshair },
+    { name: "Campaigns", href: "/campaigns", icon: Mail },
     { name: "AI Usage", href: "/ai-usage", icon: BarChart3 },
     { name: "Reports", href: "/reports", icon: BarChart3 },
     { name: "Automation", href: "/automation", icon: Zap },
